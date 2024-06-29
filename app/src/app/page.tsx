@@ -6,6 +6,7 @@ import Image from "next/image";
 export default function Home() {
 
     const [image, setImage] = useState<string | null>(null);
+    const [name, setName] = useState<string>("");
 
     const onDrop = useCallback((acceptedFiles : File[]) => {
         acceptedFiles.forEach((file) => {
@@ -15,10 +16,21 @@ export default function Home() {
             reader.onerror = () => console.log("file reading has failed");
 
             reader.onload = () => {
-                // save the image to images/ folder
-                setImage(reader.result as string);
+                // make post request to nameImage
+                fetch("/api/nameImage", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ name: file.name }),
+                })
+                .then((res) => res.json())
+                .then((data) => setName(data.name as string));
             }
             reader.readAsDataURL(file);
+
+            const url = URL.createObjectURL(file);
+            setImage(url);
         })
     }, []);
 
@@ -27,7 +39,7 @@ export default function Home() {
     return (
         <div {...getRootProps()}>
             <input {...getInputProps()} />
-            <p>Upload photo here</p>
+            <p>Upload photo here {name}</p>
 
             <div id="imageDisplay">
                 {image && 
