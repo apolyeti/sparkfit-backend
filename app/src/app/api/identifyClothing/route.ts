@@ -12,32 +12,21 @@ function getClassNamesFromDirectory(directory: string) {
 }
 
 // make post request to server
-export async function POST(req: NextRequest, res: NextResponse) {
-
+export async function POST(req: NextRequest) {
+    console.log('hi')
     // get image from request body
     const body = await req.json();
     console.log("HELLO WE GOT HERE");
-    console.log(body);
-    const image = body.image;
+
+    // download image
+    const base64Image = body.image;
+    const fileName = body.fileName;
+    const imageBuffer = Buffer.from(base64Image, 'base64');
+    fs.writeFileSync('src/app/api/identifyClothing/image.jpg', imageBuffer);
 
 
 
-    // load keras sequential model trained in python locally
-    const modelPath = path.resolve('../../../../../tools/models/classify_clothes.keras');
-    const model = await tf.loadLayersModel('file://' + modelPath);
 
-    // preprocess image
-    const tensor = tf.browser.fromPixels(image);
-    const resized = tf.image.resizeBilinear(tensor, [224, 224]);
-    const expanded = resized.expandDims(0);
-    const preprocessed = expanded.toFloat().div(255);
-
-    // predict image
-    const prediction = model.predict(preprocessed) as tf.Tensor;
-
-    const predictionData = await prediction.data();
-    const predictedClassIndex = tf.argMax(predictionData).dataSync()[0];
-    const classNames = getClassNamesFromDirectory('../../../../../tools/data/clothes/')
-
-    return NextResponse.json({ name: classNames[predictedClassIndex] });
+    
+    return NextResponse.json({ name: fileName });
 }

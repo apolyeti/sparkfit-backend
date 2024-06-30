@@ -1,19 +1,15 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
-    webpack: (config, { isServer }) => {
-        // Exclude HTML files from webpack processing
-        if (!isServer) {
-          config.module.rules.push({
-            test: /\.html$/,
-            exclude: /node_modules/,
-            use: {
-              loader: 'babel-loader',
-            },
-          });
-        }
+    webpack: (config) => {
+        config.resolve = {
+          ...config.resolve,
+          fallback: {
+            fs: false,
+          },
+        };
         return config;
       },
 };
-
 
 export default nextConfig;

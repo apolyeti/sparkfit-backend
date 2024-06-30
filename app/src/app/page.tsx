@@ -9,43 +9,38 @@ export default function Home() {
     const [name, setName] = useState<string>("");
 
     const onDrop = useCallback((acceptedFiles : File[]) => {
-        acceptedFiles.forEach((file) => {
-            const reader = new FileReader();
-            const formData = new FormData();
-            formData.append('image', file);
+        const file = acceptedFiles[0];
+        const reader = new FileReader();
 
-            fetch("/api/identifyClothing", {
-                method: "POST",
-                headers: {
+        reader.onabort = () => console.log('file reading was aborted');
+        reader.onerror = () => console.log('file reading has failed');
+
+        reader.onload = () => {
+            if (reader.result) {
+                const base64Image = reader.result.toString().split(',')[1]; // Extract the base64 part
+                fetch("/api/identifyClothing", {
+                  method: "POST",
+                  headers: {
                     "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ image: reader.result }),
-            })
-            .then((res) => res.json())
-            .then((data) => setName(data.name as string));
-
-            reader.onabort = () => console.log("file reading was aborted");
-            reader.onerror = () => console.log("file reading has failed");
-
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                // make post request to nameImage
-                // fetch("/api/nameImage", {
-                //     method: "POST",
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //     },
-                //     body: JSON.stringify({ name: file.name }),
-                // })
-                // .then((res) => res.json())
-                // // .then((data) => setName(data.name as string));
-
-                // make post request to identifyClothing
+                  },
+                  body: JSON.stringify({ 
+                    image: base64Image,
+                    fileName: file.name,
+                   }), // Send base64 part only
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.name) {
+                      setName(data.name as string);
+                    }
+                  });
+                
                 const url = URL.createObjectURL(file);
                 setImage(url);
+              }
+        };
 
-            }
-        })
+        reader.readAsDataURL(file);
     }, []);
 
     const { getRootProps, getInputProps } = useDropzone({ onDrop });
