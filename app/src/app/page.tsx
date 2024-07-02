@@ -15,8 +15,29 @@ export default function Home() {
         reader.onabort = () => console.log('file reading was aborted');
         reader.onerror = () => console.log('file reading has failed');
 
-        reader.onload = () => {
-            // get image data
+        reader.onload = async () => {
+            // get image data 
+            const imageData = reader.result as string;
+            setImage(imageData);
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/api/identifyClothing', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setName(data.name);
+                } else {
+                    console.error('Failed to get name');
+                }
+            } catch (error) {
+                console.error('Failed to get name', error);
+            }
         };
 
         reader.readAsDataURL(file);
