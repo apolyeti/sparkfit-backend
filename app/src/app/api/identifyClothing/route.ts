@@ -4,13 +4,10 @@ import * as fs from 'fs';
 import {NextRequest, NextResponse} from 'next/server';
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    const body = await req.json();
-    // const image = body.image;
+    const formData = await req.formData();
 
-    // // process the image first
-    
-    // // load the model
-    // const model = await tf.loadLayersModel('file://path/to/model.json');
+    const image = formData.get('image') as File;
+    const name = formData.get('name') as string;
 
-    // return NextResponse.json({ name: 'name' });
+    return NextResponse.json({name: name});
 }

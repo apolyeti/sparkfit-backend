@@ -19,9 +19,11 @@ export default function Home() {
             // get image data 
             const imageData = reader.result as string;
             setImage(imageData);
+            const fileName = file.name;
 
             const formData = new FormData();
             formData.append('image', file);
+            formData.append('name', fileName);
 
             try {
                 const response = await fetch('/api/identifyClothing', {
