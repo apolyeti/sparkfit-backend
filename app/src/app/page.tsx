@@ -16,28 +16,7 @@ export default function Home() {
         reader.onerror = () => console.log('file reading has failed');
 
         reader.onload = () => {
-            if (reader.result) {
-                const base64Image = reader.result.toString().split(',')[1]; // Extract the base64 part
-                fetch("/api/identifyClothing", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ 
-                    image: base64Image,
-                    fileName: file.name,
-                   }), // Send base64 part only
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    if (data.name) {
-                      setName(data.name as string);
-                    }
-                  });
-                
-                const url = URL.createObjectURL(file);
-                setImage(url);
-              }
+            // get image data
         };
 
         reader.readAsDataURL(file);
