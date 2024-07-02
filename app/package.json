@@ -1,12 +1,14 @@
 {
-  "name": "client",
+  "name": "sparkfit",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src --ext ts,tsx,js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext ts,tsx,js,jsx --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,css,scss,md,html}'"
   },
   "dependencies": {
     "@tensorflow/tfjs-node": "^4.20.0",
