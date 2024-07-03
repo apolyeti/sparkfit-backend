@@ -33,6 +33,6 @@ body {
 @layer utilities {
     /* make text a certain font */
     .font {
-        font-family: 'Roboto', sans-serif;
+        font-family: 'courier new', monospace;
     }
 }
