@@ -8,6 +8,10 @@ const nextConfig = {
             fs: false,
           },
         };
+        config.externals = [
+            ...(config.externals || []),
+            'node-pre-gyp'
+        ];
         return config;
       },
 };
