@@ -11,12 +11,11 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-        <h1 className="text-4xl font-bold">
-            Sparkfit
-        </h1>
-        {/* add spacer here */}
-        <span className="block h-4"></span>
-        <p>Get outfit suggestions based on the weather</p>
+        {/* create block design for home page */}
+        <div className="flex flex-col items-center justify-center h-screen">
+            <h1 className="text-6xl font-bold">Sparkfit</h1>
+            <p className="text-2xl">Get outfit suggestions based on the weather</p>
+        </div>
     </>
   );
 }

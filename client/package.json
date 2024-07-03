@@ -15,7 +15,8 @@
     "@heroicons/react": "^2.1.4",
     "next": "14.2.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-dropzone": "^14.2.3"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.6.0",
