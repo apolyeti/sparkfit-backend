@@ -12,33 +12,18 @@ export default function FileInput(FileInputProps: FileInputProps) {
 
     const onDrop = useCallback((acceptedFiles : File[]) => {
         // get each file
-        acceptedFiles.forEach((file: File) => {
-            const reader = new FileReader();
+        const file = acceptedFiles[0];
 
-            reader.onabort = () => console.log('file reading was aborted');
-            reader.onerror = () => console.log('file reading has failed');
+        const reader = new FileReader();
 
+        reader.onabort = () => console.log('file reading was aborted');
+        reader.onerror = () => console.log('file reading has failed');
+
+        reader.onload = async () => {
             const formData = new FormData();
+        }
 
-            reader.onload = async () => {
-                const binaryStr = reader.result as string;
-                const imageName = file.name;
 
-                const images = JSON.parse(localStorage.getItem("images") || "[]");
-                const newImage : SparkFitImage = {
-                    name: imageName,
-                    data: binaryStr
-                }
-
-                images.push(newImage);
-                localStorage.setItem("images", JSON.stringify(images));
-
-                FileInputProps.onImageUpload(newImage);
-
-            }
-
-            reader.readAsDataURL(file);
-        });
     }, []);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
