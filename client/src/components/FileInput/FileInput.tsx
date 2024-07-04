@@ -21,6 +21,7 @@ export default function FileInput(FileInputProps: FileInputProps) {
 
         reader.onload = async () => {
             const formData = new FormData();
+            
         }
 
 
@@ -34,7 +35,7 @@ export default function FileInput(FileInputProps: FileInputProps) {
             {
                 isDragActive ?
                 <p>Drop the files here ...</p> :
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>Drag and drop some files here, or click to select files</p>
             }
         </div>
     )
