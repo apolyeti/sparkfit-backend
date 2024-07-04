@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "flask-dev": "FLASK_DEBUG=1 pip install -r ../server/requirements.txt && python3 ../server/run.py",
+    "next-dev": "next dev",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -13,6 +15,7 @@
   "dependencies": {
     "@headlessui/react": "^2.1.1",
     "@heroicons/react": "^2.1.4",
+    "concurrently": "^8.2.2",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",

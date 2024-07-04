@@ -4,11 +4,8 @@ import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import type { SparkFitImage } from "@utils/types";
 
-interface FileInputProps {
-    onImageUpload: (image: SparkFitImage) => void;
-}
 
-export default function FileInput(FileInputProps: FileInputProps) {
+export default function FileInput() {
 
     const onDrop = useCallback((acceptedFiles : File[]) => {
         // get each file
@@ -21,9 +18,31 @@ export default function FileInput(FileInputProps: FileInputProps) {
 
         reader.onload = async () => {
             const formData = new FormData();
+            // request body needs
+            // name of image
+            // data of image
+            formData.append("name", file.name);
+            formData.append("data", reader.result as string);
+            
+            try {
+                const response = await fetch("api/classifyClothing", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to upload image");
+                }
+
+                console.log(response);
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
             
         }
-
+        reader.readAsDataURL(file);
 
     }, []);
 

@@ -71,3 +71,7 @@ def classify_clothing():
 @api.route('/classifyClothing', methods=['GET'])
 def classify_clothing_get():
     return jsonify({'message': 'GET request received'})
+
+@api.route('/', methods=['GET'])
+def home():
+    return jsonify({'message': 'Welcome to the SparkFit API!'})

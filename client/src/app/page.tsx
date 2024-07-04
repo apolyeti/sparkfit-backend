@@ -10,13 +10,6 @@ export const metadata: Metadata = {
     description: "Get outfit suggestions based on the weather",
 }
 
-const HomeClientComponent = dynamic(() => import("../components/ClientComponents/HomeClientComponent"), {
-    ssr: false,
-});
-
-
-
-
 
 
 export default function Home() {
@@ -36,7 +29,7 @@ export default function Home() {
 
         {/* create block design for file input */}
         <div className="flex flex-col items-center justify-center h-screen">
-            <HomeClientComponent />
+            <FileInput />
         </div>
 
 
