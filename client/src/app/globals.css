@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+    --african-violet: #a393bfff;
+    --african-violet-2: #9882acff;
+    --pomp-and-power: #594d6a;
+    --english-violet: #453750ff;
+    --floral-white: #f7f4eaff;
+
+    /* set background to english violet */
+    --background-start: var(--pomp-and-power);
+    --background-end: var(--english-violet);
+    --foreground: var(--floral-white);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --background-start: var(--floral-white);
+        --background-end: var(--african-violet);
+        --foreground: var(--english-violet);
+    }
+}
+
+body {
+    background: linear-gradient(100deg, var(--background-start), var(--background-end));
+    background-blend-mode: overlay;
+    color: var(--foreground);
+}
+
+@layer utilities {
+    /* make text a certain font */
+    .font {
+        font-family: 'courier new', monospace;
+    }
+}
