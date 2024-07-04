@@ -1,15 +1,31 @@
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Metadata } from "next";
+import { useEffect, useState } from "react";
 import FileInput from "@components/FileInput/FileInput";
+
 
 export const metadata: Metadata = {
     title: "Sparkfit",
     description: "Get outfit suggestions based on the weather",
 }
 
+const HomeClientComponent = dynamic(() => import("../components/ClientComponents/HomeClientComponent"), {
+    ssr: false,
+});
+
+
+
+
 
 
 export default function Home() {
+
+
+
+    // load local storage and check if image is present
+    // const image = localStorage.getItem("image");
+
   return (
     <>
         {/* create block design for home page */}
@@ -19,9 +35,10 @@ export default function Home() {
         </div>
 
         {/* create block design for file input */}
-        <div className="flex flex-col items-center  h-screen">
-            <FileInput />
+        <div className="flex flex-col items-center justify-center h-screen">
+            <HomeClientComponent />
         </div>
+
 
     </>
   );
