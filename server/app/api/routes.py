@@ -4,19 +4,33 @@ from tensorflow import keras
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import boto3
+import os
 
 # following this docstring format:
 # https://stackoverflow.com/a/43912874/18797962
 # https://swagger.io/docs/specification/describing-parameters/
 
+# retrieve access key and secret key from environment variables
+ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
+SECRET_KEY = os.getenv('AWS_SECRET_KEY_ID')
+REGION = os.getenv('AWS_REGION')
+
 api = Blueprint('api', __name__)
 
 # Load the trained model
 session = boto3.Session(
-    aws_access_key_id='ACCESS_KEY',
-    aws_secret_access_key='SECRET_KEY',
-    region_name='us-east-1'
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    region_name=REGION
 )
+
+bucket_name = 'sparkfit'
+object_key = 'models/classify_clothes.keras'
+local_file_path = 'aws/downloads/models/classify_clothes.keras'
+
+s3 = session.client('s3')
+
+s3.download_file(bucket_name, object_key, local_file_path)
 
 
 
