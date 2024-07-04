@@ -1,4 +1,8 @@
 from flask import Blueprint, jsonify
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
 
 # following this docstring format:
 # https://stackoverflow.com/a/43912874/18797962
@@ -36,4 +40,12 @@ def classify_clothing():
         500:
             description: Internal server error
     """
+    print('Classifying clothing...')
     return jsonify({'message': 'Classifying clothing...'})
+
+
+
+
+@api.route('/classifyClothing', methods=['GET'])
+def classify_clothing_get():
+    return jsonify({'message': 'GET request received'})
