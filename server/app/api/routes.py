@@ -3,12 +3,20 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import boto3
 
 # following this docstring format:
 # https://stackoverflow.com/a/43912874/18797962
 # https://swagger.io/docs/specification/describing-parameters/
 
 api = Blueprint('api', __name__)
+
+# Load the trained model
+session = boto3.Session(
+    aws_access_key_id='ACCESS_KEY',
+    aws_secret_access_key='SECRET_KEY',
+    region_name='us-east-1'
+)
 
 
 
