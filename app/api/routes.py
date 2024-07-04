@@ -1,5 +1,9 @@
 from flask import Blueprint, jsonify
 
+# following this docstring format:
+# https://stackoverflow.com/a/43912874/18797962
+# https://swagger.io/docs/specification/describing-parameters/
+
 api = Blueprint('api', __name__)
 
 
