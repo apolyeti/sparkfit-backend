@@ -1,10 +1,14 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import matplotlib.pyplot as plt
+import numpy as np
 import boto3
 import os
+import io
+from PIL import Image
 
 # following this docstring format:
 # https://stackoverflow.com/a/43912874/18797962
@@ -42,6 +46,7 @@ else:
     print('\033[93m' + 'Model already found in downloads directory' + '\033[0m')
 
 model = load_model(local_file_path)
+print(model.input_shape)
 
 # Load the class names
 class_path = 'utils/labels.txt'
@@ -49,7 +54,7 @@ class_path = 'utils/labels.txt'
 with open(class_path, 'r') as f:
     class_names = f.read().splitlines()
 
-print('\033[93m' + 'Model and class names loaded successfully!' + '\033[0m')
+print('\033[1;92m' + 'Model and class names loaded successfully!' + '\033[0m')
 
 
 
@@ -82,7 +87,42 @@ def classify_clothing():
             description: Internal server error
     """
 
-    return jsonify({'message': 'Classifying clothing...'})
+    # get json data
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    if file:
+        # make greyscale and invert colors
+        img = Image.open(file).convert('L')
+        img = Image.eval(img, lambda x: 255-x)
+        img = img.resize((28, 28))
+        img_array = np.array(img) / 255.0
+
+
+        img_array = np.expand_dims(img_array, axis=(0, -1))
+
+        # download image as it is and save it
+        img.save('aws/downloads/' + file.filename)
+
+        predictions = model.predict(img_array)
+        # get top 3 predictions
+        top3 = np.argsort(predictions[0])[-3:][::-1]
+
+        top_3_classes = [class_names[i] for i in top3]
+
+
+        response = {
+            'predictions': top_3_classes,
+            'file_name': file.filename
+        }
+
+        return jsonify(response), 200
+
 
 
 
