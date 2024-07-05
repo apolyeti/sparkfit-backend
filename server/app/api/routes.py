@@ -32,10 +32,14 @@ s3 = session.client('s3')
 
 # check if we already have downloaded the model
 if not os.path.exists(local_file_path):
-    print('\033[93m' + 'Model not found. Downloading from S3...' + '\033[0m')
-    s3.download_file(bucket_name, object_key, local_file_path)
+    print('\033[94m' + 'Model not found. Downloading from S3...' + '\033[0m')
+    try:
+        s3.download_file(bucket_name, object_key, local_file_path)
+        print('\033[92m' + 'Model downloaded successfully!' + '\033[0m')
+    except Exception as e:
+        print('\033[91m' + 'Error downloading model: ' + str(e) + '\033[0m')
 else:
-    print('\033[92m' + 'Model already found in downloads directory' + '\033[0m')
+    print('\033[93m' + 'Model already found in downloads directory' + '\033[0m')
 
 model = load_model(local_file_path)
 
@@ -45,7 +49,7 @@ class_path = 'utils/labels.txt'
 with open(class_path, 'r') as f:
     class_names = f.read().splitlines()
 
-print('\033[92m' + 'Model and class names loaded successfully!' + '\033[0m')
+print('\033[93m' + 'Model and class names loaded successfully!' + '\033[0m')
 
 
 
