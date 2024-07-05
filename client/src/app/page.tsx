@@ -24,12 +24,10 @@ export default function Home() {
         {/* create block design for home page */}
         <div className="flex flex-col items-center justify-center h-screen">
             <h1 className="text-6xl font-bold">Sparkfit</h1>
-            <p className="text-2xl">Get outfit suggestions based on the weather</p>
-        </div>
-
-        {/* create block design for file input */}
-        <div className="flex flex-col items-center justify-center h-screen">
-            <FileInput />
+            <p className="text-1xl">Get outfit suggestions based on the weather</p>
+            <div className="mt-8">
+                <FileInput />
+            </div>
         </div>
 
 

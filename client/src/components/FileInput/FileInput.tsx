@@ -18,11 +18,9 @@ export default function FileInput() {
 
         reader.onload = async () => {
             const formData = new FormData();
-            // request body needs
-            // name of image
-            // data of image
-            formData.append("name", file.name);
-            formData.append("data", reader.result as string);
+            
+            formData.append('file', file);
+            formData.append('name', file.name);
             
             try {
                 const response = await fetch("api/classifyClothing", {
@@ -33,8 +31,6 @@ export default function FileInput() {
                 if (!response.ok) {
                     throw new Error("Failed to upload image");
                 }
-
-                console.log(response);
                 const data = await response.json();
                 console.log(data);
             } catch (error) {
