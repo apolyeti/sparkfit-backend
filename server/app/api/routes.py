@@ -30,7 +30,22 @@ local_file_path = 'aws/downloads/models/classify_clothes.keras'
 
 s3 = session.client('s3')
 
-s3.download_file(bucket_name, object_key, local_file_path)
+# check if we already have downloaded the model
+if not os.path.exists(local_file_path):
+    print('\033[93m' + 'Model not found. Downloading from S3...' + '\033[0m')
+    s3.download_file(bucket_name, object_key, local_file_path)
+else:
+    print('\033[92m' + 'Model already found in downloads directory' + '\033[0m')
+
+model = load_model(local_file_path)
+
+# Load the class names
+class_path = 'utils/labels.txt'
+
+with open(class_path, 'r') as f:
+    class_names = f.read().splitlines()
+
+print('\033[92m' + 'Model and class names loaded successfully!' + '\033[0m')
 
 
 
@@ -62,7 +77,7 @@ def classify_clothing():
         500:
             description: Internal server error
     """
-    print('Classifying clothing...')
+
     return jsonify({'message': 'Classifying clothing...'})
 
 

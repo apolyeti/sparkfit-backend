@@ -33,8 +33,6 @@ export default function FileInput() {
                 if (!response.ok) {
                     throw new Error("Failed to upload image");
                 }
-
-                console.log(response);
                 const data = await response.json();
                 console.log(data);
             } catch (error) {
