@@ -107,7 +107,7 @@ def classify_clothing():
         img_array = np.expand_dims(img_array, axis=(0, -1))
 
         # download image as it is and save it
-        img.save('aws/downloads/' + file.filename)
+        # img.save('aws/downloads/' + file.filename)
 
         predictions = model.predict(img_array)
         # get top 3 predictions
