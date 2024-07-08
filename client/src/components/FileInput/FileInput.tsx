@@ -68,11 +68,14 @@ export default function FileInput() {
                 }
             </div>
             {image && (
-                <div className="mt-4">
+                <div className="mt-4 flex flex-col items-center">
                     <Image src={image.data} width={200} height={200} alt={image.name} />
-                    <span>
+                    {/* make span go horizontally */}
+                    <span className="flex flex-col items-center mt-2"> 
+                        {/* make image name bold */}
                         <p className="text-xl">{image.name}</p>
-                        <p className="text-sm"> {image.file_name}</p>
+                        {/* make file name grey and italicized */}
+                        <p className="text-gray-50 italic">{image.file_name}</p>
                     </span>
                 </div>
             )}
