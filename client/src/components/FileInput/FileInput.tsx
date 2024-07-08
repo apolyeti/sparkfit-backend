@@ -38,9 +38,10 @@ export default function FileInput() {
                 console.log(data);
 
                 const newImage : SparkFitImage = {
-                    name: data.predictions[0],
+                    name: data.description,
                     // url for Image src
-                    data: URL.createObjectURL(file)
+                    data: URL.createObjectURL(file),
+                    file_name: file.name
                 }
 
                 setImage(newImage);
@@ -69,7 +70,10 @@ export default function FileInput() {
             {image && (
                 <div className="mt-4">
                     <Image src={image.data} width={200} height={200} alt={image.name} />
-                    <p className="text-xl">{image.name}</p>
+                    <span>
+                        <p className="text-xl">{image.name}</p>
+                        <p className="text-sm"> {image.file_name}</p>
+                    </span>
                 </div>
             )}
         </>
