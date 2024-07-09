@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import type { SparkFitImage } from "@utils/types";
@@ -8,7 +8,18 @@ import type { SparkFitImage } from "@utils/types";
 
 export default function FileInput() {
 
-    const [image, setImage] = useState<SparkFitImage | null>(null);
+    const [images, setImages] = useState<SparkFitImage[]>([]);
+
+    useEffect(() => {
+        const storedImages = localStorage.getItem("images");
+        if (storedImages) {
+            setImages(JSON.parse(storedImages));
+        }
+    }
+    , []);
+
+
+
 
     const onDrop = useCallback((acceptedFiles : File[]) => {
         // get each file
@@ -42,8 +53,10 @@ export default function FileInput() {
                     // url for Image src
                     data: URL.createObjectURL(file)
                 }
-
-                setImage(newImage);
+                
+                const updatedImages = [...images, newImage];
+                setImages(updatedImages);
+                localStorage.setItem("images", JSON.stringify(updatedImages));
 
             } catch (error) {
                 console.error(error);
@@ -52,7 +65,7 @@ export default function FileInput() {
         }
         reader.readAsDataURL(file);
 
-    }, []);
+    }, [images]);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
@@ -66,12 +79,6 @@ export default function FileInput() {
                     <p>Drag and drop some files here, or click to select files</p>
                 }
             </div>
-            {image && (
-                <div className="mt-4">
-                    <Image src={image.data} width={200} height={200} alt={image.name} />
-                    <p className="text-xl">{image.name}</p>
-                </div>
-            )}
         </>
     )
 }

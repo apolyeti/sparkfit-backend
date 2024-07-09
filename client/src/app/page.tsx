@@ -1,16 +1,15 @@
-import Image from "next/image";
-import dynamic from "next/dynamic";
+
 import { Metadata } from "next";
-import { useEffect, useState } from "react";
 import FileInput from "@components/FileInput/FileInput";
+import { SparkFitImage } from "@utils/types";
+import Closet from "@components/Closet";
+
 
 
 export const metadata: Metadata = {
     title: "Sparkfit",
     description: "Get outfit suggestions based on the weather",
 }
-
-
 
 export default function Home() {
 
@@ -27,6 +26,9 @@ export default function Home() {
             <p className="text-1xl">Get outfit suggestions based on the weather</p>
             <div className="mt-8">
                 <FileInput />
+            </div>
+            <div className="mt-8">
+                <Closet />
             </div>
         </div>
 
