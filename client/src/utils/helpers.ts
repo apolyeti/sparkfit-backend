@@ -1,4 +1,4 @@
-function storageAvailable(type: 'localStorage' | 'sessionStorage'): boolean {
+export function storageAvailable(type: 'localStorage' | 'sessionStorage'): boolean {
     let storage: Storage | null = null;
     try {
         storage = window[type as keyof Window] as Storage;
