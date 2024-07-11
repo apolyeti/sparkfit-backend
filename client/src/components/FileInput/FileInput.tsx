@@ -51,7 +51,8 @@ export default function FileInput() {
                 const newImage : SparkFitImage = {
                     name: data.predictions[0],
                     // url for Image src
-                    data: URL.createObjectURL(file)
+                    data: URL.createObjectURL(file),
+                    file_name: file.name
                 }
                 
                 const updatedImages = [...images, newImage];
