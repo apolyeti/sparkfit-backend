@@ -5,21 +5,11 @@ import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import type { SparkFitImage } from "@utils/types";
 
+interface FileInputProps {
+    addImage: (image: SparkFitImage) => void;
+}
 
-export default function FileInput() {
-
-    const [images, setImages] = useState<SparkFitImage[]>([]);
-
-    useEffect(() => {
-        const storedImages = localStorage.getItem("images");
-        if (storedImages) {
-            setImages(JSON.parse(storedImages));
-        }
-    }
-    , []);
-
-
-
+export default function FileInput({addImage} : FileInputProps){
 
     const onDrop = useCallback((acceptedFiles : File[]) => {
         // get each file
@@ -55,9 +45,7 @@ export default function FileInput() {
                     file_name: file.name
                 }
                 
-                const updatedImages = [...images, newImage];
-                setImages(updatedImages);
-                localStorage.setItem("images", JSON.stringify(updatedImages));
+                addImage(newImage);
 
             } catch (error) {
                 console.error(error);
@@ -66,13 +54,14 @@ export default function FileInput() {
         }
         reader.readAsDataURL(file);
 
-    }, [images]);
+    }, [addImage]);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
     return (
         <>
-            <div {...getRootProps()} className="border-2 border-dashed border-gray-40 p-4 w-full text-center">
+            <div {...getRootProps()} 
+            className="border-2 border-dashed border-gray-40 p-4 w-full text-center">
                 <input {...getInputProps()} />
                 {
                     isDragActive ?

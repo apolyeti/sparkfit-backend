@@ -5,33 +5,11 @@ import type { SparkFitImage } from "@utils/types";
 import { useState, useEffect } from "react";
 
 
-export default function Closet() {
+interface ClosetProps {
+    images: SparkFitImage[];
+}
 
-    const [images, setImages] = useState<SparkFitImage[]>([]);
-
-    const loadImages = () => {
-        const storedImages = localStorage.getItem("images");
-        if (storedImages) {
-            setImages(JSON.parse(storedImages));
-        }
-    }
-
-    useEffect(() => {
-        loadImages();
-
-        const handleStorageChange = (event: StorageEvent) => {
-            if (event.key === "images") {
-                loadImages();
-            }
-        }
-
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        }
-        
-    }, []);
+export default function Closet({images} : ClosetProps){
 
     
     return (
