@@ -1,0 +1,15 @@
+Cotton
+Wool
+Silk
+Linen
+Polyester
+Nylon
+Rayon
+Spandex
+Denim
+Chiffon
+Satin
+Velvet
+Jersey
+Leather
+Suede
