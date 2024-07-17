@@ -1,9 +1,11 @@
 from flask import Flask
+from flask_cors import CORS
 import os
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
@@ -21,6 +23,11 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    # import module getWeather.py from api/ directory
+    from . import getWeather
+    app.register_blueprint(getWeather.bp)
+
 
     # a simple page that says hello
     @app.route('/hello')
