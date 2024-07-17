@@ -25,8 +25,9 @@ def create_app(test_config=None):
         pass
 
     # import module getWeather.py from api/ directory
-    from . import getWeather
+    from . import getWeather, clothes
     app.register_blueprint(getWeather.bp)
+    app.register_blueprint(clothes.bp)
 
 
     # a simple page that says hello
