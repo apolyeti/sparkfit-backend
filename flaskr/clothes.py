@@ -1,118 +1,70 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
 )
-from flask_cors import CORS
-import requests
+from flask_cors import CORS # type: ignore
 import tensorflow as tf
+from tensorflow.keras.models import load_model # type: ignore
+from tensorflow.keras.preprocessing import image # type: ignore
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
 from PIL import Image
+
 import os
 import io
 import boto3
+import requests
+import base64
 
-ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
-SECRET_KEY = os.getenv('AWS_SECRET_KEY_ID')
-REGION = os.getenv('AWS_REGION')
-
-session = boto3.Session(
-    aws_access_key_id=ACCESS_KEY,
-    aws_secret_access_key=SECRET_KEY,
-    region_name=REGION
-)
-
-
-local_file_path = 'flaskr/aws/downloads/models/classify_clothes.keras'
-bucket_name = 'sparkfit'
-object_key = 'models/classify_clothes.keras'
-
-s3 = session.client('s3')
-
-# Check if the model is already in the cache
-if not os.path.exists(local_file_path):
-    print('\033[94m' + 'Model not found. Downloading from AWS S3...' + '\033[0m')
-    try:
-        s3.download_file(bucket_name, object_key, local_file_path)
-        print('\033[92m' + 'Model downloaded successfully!' + '\033[0m')
-    except Exception as e:
-        print('\033[91m' + 'Error downloading model from S3: ' + str(e) + '\033[0m')
-else:
-    print('\033[93m' + 'Model already found in downloads directory' + '\033[0m')
-
-model = load_model(local_file_path)
-print(model.summary())
-
-class_path = 'flaskr/utils/labels.txt'
-
-with open(class_path, 'r') as f:
-    class_names = f.read().splitlines()
+from flaskr.classes import SparkFitImage
+from flaskr.s3_session import model, class_names
 
 print('\033[1;92m' + 'Model and class names loaded successfully!' + '\033[0m')
+print(model.summary())
+
 
 bp = Blueprint('clothes', __name__, url_prefix='/clothes')
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @bp.route('/classify', methods=['POST'])
 def classify():
-    """
-    /clothes/classify
-    ---
-    tags:
-      - Clothing Classification
-    description: Classify clothing using a trained model
-    parameters:
-        -   name: name
-            in: query
-            type: string
-            required: true
-            description: The name of the image file
-        -   name: image
-            in: query
-            type: file
-            required: true
-            description: The image file to classify
-    responses:
-        200:
-            description: Clothing classification successful
-        400:
-            description: Bad request
-        500:
-            description: Internal server error
-    """
+    """Will receive a list of files """
+    if 'files' not in request.files:
+        return jsonify({'error': 'No files found in request'}), 400
 
-    # get json data
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    
-    file = request.files['file']
 
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    files = request.files.getlist('files')
     
-    if file:
-        # make greyscale and invert colors
+    results = []
+    
+    for file in files:
+        file_contents = file.read()
+
         img = Image.open(file).convert('L')
-        img = Image.eval(img, lambda x: 255-x)
+        img = Image.eval(img, lambda x: 255 - x)
         img = img.resize((28, 28))
         img_array = np.array(img) / 255.0
 
-
         img_array = np.expand_dims(img_array, axis=(0, -1))
 
-        # download image as it is and save it
-        # img.save('aws/downloads/' + file.filename)
-
         predictions = model.predict(img_array)
-        # get top 3 predictions
-        top3 = np.argsort(predictions[0])[-3:][::-1]
+        # get top 5 predictions
+        top_5 = np.argsort(predictions[0])[-5:][::-1]
 
-        top_3_classes = [class_names[i] for i in top3]
+        new_sparkfit_image = SparkFitImage(
+            predicted_classes=[class_names[i] for i in top_5],
+            file_name=file.filename,
+            data=base64.b64encode(file_contents).decode('utf-8'),
+            fabric=None,
+            color=None,
+            fit=None
+        )
+
+        results.append(new_sparkfit_image)
+        print('Image classified successfully!')
 
 
-        response = {
-            'predictions': top_3_classes,
-            'file_name': file.filename
-        }
 
-        return jsonify(response), 200
+    response = {
+        'results': [result.__dict__ for result in results]
+    }
+
+    return jsonify(response), 200
