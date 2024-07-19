@@ -18,7 +18,7 @@ from flaskr.classes import SparkFitImage
 from flaskr.s3_session import model, class_names
 
 print('\033[1;92m' + 'Model and class names loaded successfully!' + '\033[0m')
-print(model.summary())
+# print(model.summary())
 
 
 bp = Blueprint('clothes', __name__, url_prefix='/clothes')
@@ -49,10 +49,12 @@ def classify():
         # get top 5 predictions
         top_5 = np.argsort(predictions[0])[-5:][::-1]
 
+        encoded_image = base64.b64encode(file_contents).decode('utf-8')
+
         new_sparkfit_image = SparkFitImage(
             predicted_classes=[class_names[i] for i in top_5],
             file_name=file.filename,
-            data=base64.b64encode(file_contents).decode('utf-8'),
+            data=f"data:image/jpeg;base64,{encoded_image}",
             fabric=None,
             color=None,
             fit=None
