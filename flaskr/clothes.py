@@ -61,7 +61,6 @@ def classify():
         )
 
         results.append(new_sparkfit_image)
-        print('Image classified successfully!')
 
 
 
