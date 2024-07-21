@@ -19,11 +19,11 @@ dynamodb = session.resource('dynamodb')
 def add_user(user: SparkFitUser):
     table = dynamodb.Table('users')
 
-    # check if user already exists
+    # check if user already exists, if so, exit function
     try:
         get_user(user.email)
-        raise ValueError('User already exists')
-    except Exception as e:
+        return
+    except:
         pass
 
     response = table.put_item(

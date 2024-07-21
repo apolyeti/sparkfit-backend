@@ -65,3 +65,11 @@ def fetch_user_images(email):
 
     return image_files
 
+def upload_image(email, file_name, file_data):
+    subdir_name = email.split('@')[0]
+    object_key = f'images/{subdir_name}/{file_name}'
+    bucket_name = 'sparkfit'
+
+    response = s3.put_object(Bucket=bucket_name, Key=object_key, Body=file_data)
+
+    return response
