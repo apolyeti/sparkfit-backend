@@ -1,5 +1,7 @@
 import boto3
 import os
+from classes import SparkFitImage, SparkFitUser
+from typing import List
 
 ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 SECRET_KEY = os.getenv('AWS_SECRET_KEY_ID')
@@ -14,70 +16,112 @@ session = boto3.Session(
 dynamodb = session.resource('dynamodb')
 
 
-def get_table(table_name):
-    return dynamodb.Table(table_name)
-
-def delete_table(table_name):
-    table = get_table(table_name)
-    table.delete()
-    table.wait_until_not_exists()
-
-def create_example_table():
-    table = dynamodb.create_table(
-        TableName='example',
-        KeySchema=[
-            {
-                'AttributeName': 'email',
-                'KeyType': 'HASH'
-            }
-        ],
-        AttributeDefinitions=[
-            {
-                'AttributeName': 'email',
-                'AttributeType': 'S'
-            }
-        ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 5,
-            'WriteCapacityUnits': 5
-        }
-    )
-
-    table.wait_until_exists()
-
-    print(f"Table {table.table_name} created successfully with item count: {table.item_count}")
-
-
-
-def set_example_user():
-    table = get_table('example')
-    table.put_item(
+def add_user(user: SparkFitUser):
+    table = dynamodb.Table('users')
+    response = table.put_item(
         Item={
-            'username': 'example_user',
-            'password': 'example_password',
-            'email': 'example@example.com'
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'clothes': user.clothes
         }
     )
+    return response
 
-
-def get_example_user():
-    table = get_table('example')
-    key = {'email': 'example@example.com'}
+def get_user(email: str):
+    table = dynamodb.Table('users')
     response = table.get_item(
-        Key=key
+        Key={
+            'email': email
+        }
+    )
+    return response['Item']
+
+def add_clothes(email: str, clothes: List[SparkFitImage]):
+    for cloth in clothes:
+        if not cloth.photo_id:
+            raise ValueError('photo_id is required for each clothing item')
+
+    clothes_list = [item.to_dict() for item in clothes]
+
+    table = dynamodb.Table('users')
+    response = table.update_item(
+        Key={
+            'email': email
+        },
+        UpdateExpression='SET clothes = list_append(if_not_exists(clothes, :empty_list), :c)',
+        ExpressionAttributeValues={
+            ':c': clothes_list,
+            ':empty_list': []
+        },
+        ReturnValues="UPDATED_NEW"
     )
 
-    item = response.get('Item')
-    if item:
-        print(f"User found: {item}")
-    else:
-        print("User not found")
+    return response
 
-if __name__ == '__main__':
-    delete_table('example')
-    create_example_table()
-    set_example_user()
-    get_example_user()
+def delete_clothes(email: str, clothes: SparkFitImage):
+    table = dynamodb.Table('users')
+    response = table.update_item(
+        Key={
+            'email': email
+        },
+        UpdateExpression='REMOVE clothes[:c]',
+        ExpressionAttributeValues={
+            ':c': clothes
+        }
+    )
+    return response
+
+def get_clothes(email: str):
+    table = dynamodb.Table('users')
+    response = table.get_item(
+        Key={
+            'email': email
+        }
+    )
+    return response['Item']['clothes']
+
+# if __name__ == '__main__':
+#     user = SparkFitUser(
+#         first_name='John',
+#         last_name='Doe',
+#         email='example@example.com',
+#         clothes=[]
+#     )
+
+#     print('user added')
+
+#     clothes = [
+#         SparkFitImage(
+#             photo_id='1',
+#             predicted_classes=['t-shirt', 'jeans'],
+#             file_name='test.jpg',
+#             data='data:image/jpeg;base64,encoded_image',
+#             fabric='cotton',
+#             color='blue',
+#             fit='slim'
+#         ),
+#         SparkFitImage(
+#             photo_id='2',
+#             predicted_classes=['t-shirt', 'jeans'],
+#             file_name='test.jpg',
+#             data='data:image/jpeg;base64,encoded_image',
+#             fabric='cotton',
+#             color='blue',
+#             fit='slim'
+#         )
+#     ]
+
+#     try:
+#         add_clothes(user.email, clothes)
+#         print('clothes added')
+#     except Exception as e:
+#         print(e)
+#         print('clothes not added')
+    
+#     print(get_clothes(user.email))
+    
+
 
 
 
