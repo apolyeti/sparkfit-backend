@@ -1,11 +1,40 @@
 from dataclasses import dataclass
 from typing import Optional, List
 
-@dataclass
 class SparkFitImage:
-    predicted_classes: List[str]
-    file_name: str
-    data: str
-    fabric: Optional[str]
-    color: Optional[str]
-    fit: Optional[str]
+    def __init__(self, photo_id, predicted_classes, file_name, data, fabric, color, fit):
+        self.photo_id = photo_id
+        self.predicted_classes = predicted_classes
+        self.file_name = file_name
+        self.data = data
+        self.fabric = fabric
+        self.color = color
+        self.fit = fit
+
+    def to_dict(self):
+        return {
+            
+            'predicted_classes': self.predicted_classes,
+            'file_name': self.file_name,
+            'data': self.data,
+            'fabric': self.fabric,
+            'color': self.color,
+            'fit': self.fit
+        }
+
+class SparkFitUser:
+
+    def __init__(self, first_name, last_name, email, clothes):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.clothes = clothes
+
+    def to_dict(self):
+        return {
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'clothes': [item.to_dict() for item in self.clothes]
+        }
+
