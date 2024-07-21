@@ -1,6 +1,6 @@
 import boto3
 import os
-from classes import SparkFitImage, SparkFitUser
+from flaskr.classes import SparkFitImage, SparkFitUser
 from typing import List
 
 ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
@@ -18,6 +18,14 @@ dynamodb = session.resource('dynamodb')
 
 def add_user(user: SparkFitUser):
     table = dynamodb.Table('users')
+
+    # check if user already exists
+    try:
+        get_user(user.email)
+        raise ValueError('User already exists')
+    except Exception as e:
+        pass
+
     response = table.put_item(
         Item={
             'email': user.email,
