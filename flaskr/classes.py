@@ -2,14 +2,17 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 class SparkFitImage:
-    def __init__(self, photo_id, predicted_classes, file_name, data, fabric, color, fit):
+    def __init__(self, photo_id, predicted_classes, file_name, data, fabric, color, fit, category, data_url=None):
         self.photo_id = photo_id
         self.predicted_classes = predicted_classes
         self.file_name = file_name
         self.data = data
+        if data_url is None:
+            self.data_url = f'data:image/jpeg;base64,{data}'
         self.fabric = fabric
         self.color = color
         self.fit = fit
+        self.category = category
 
     def to_dict(self):
         return {

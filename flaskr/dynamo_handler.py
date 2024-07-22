@@ -3,6 +3,7 @@ import os
 from flaskr.classes import SparkFitImage, SparkFitUser
 from typing import List
 
+
 ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 SECRET_KEY = os.getenv('AWS_SECRET_KEY_ID')
 REGION = os.getenv('AWS_REGION')
@@ -50,7 +51,19 @@ def add_clothes(email: str, clothes: List[SparkFitImage]):
         if not cloth.photo_id:
             raise ValueError('photo_id is required for each clothing item')
 
-    clothes_list = [item.to_dict() for item in clothes]
+    clothes_list = []
+    for cloth in clothes:
+        clothes_list.append(
+            {
+                'photo_id': cloth.photo_id,
+                'category': cloth.category,
+                'file_name': cloth.file_name,
+                'fabric': cloth.fabric,
+                'color': cloth.color,
+                'fit': cloth.fit
+            }
+        )
+
 
     table = dynamodb.Table('users')
     response = table.update_item(
