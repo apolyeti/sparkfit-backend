@@ -7,6 +7,7 @@ from tensorflow.keras.models import load_model # type: ignore
 from tensorflow.keras.preprocessing import image # type: ignore
 import numpy as np
 from PIL import Image
+import uuid
 
 import os
 import io
@@ -15,7 +16,8 @@ import requests
 import base64
 
 from flaskr.classes import SparkFitImage
-from flaskr.s3_session import model, class_names
+from flaskr.s3_session import model, class_names, upload_image
+import flaskr.dynamo_handler as db
 
 print('\033[1;92m' + 'Model and class names loaded successfully!' + '\033[0m')
 # print(model.summary())
@@ -52,9 +54,11 @@ def classify():
         encoded_image = base64.b64encode(file_contents).decode('utf-8')
 
         new_sparkfit_image = SparkFitImage(
+            photo_id=str(uuid.uuid4()),
             predicted_classes=[class_names[i] for i in top_5],
+            category=class_names[top_5[0]],
             file_name=file.filename,
-            data=f"data:image/jpeg;base64,{encoded_image}",
+            data=encoded_image,
             fabric=None,
             color=None,
             fit=None
@@ -66,6 +70,29 @@ def classify():
 
     response = {
         'results': [result.__dict__ for result in results]
+    }
+
+    return jsonify(response), 200
+
+@bp.route('/add', methods=['POST'])
+def add_clothes():
+    """Add a user's clothes to the database"""
+    data = request.get_json()
+    email = data['email']
+    clothes = data['clothes']
+
+    # translate to SparkFitImage objects
+    clothes = [SparkFitImage(**cloth) for cloth in clothes]
+
+    db.add_clothes(email, clothes)
+
+    for cloth in clothes:
+        image_data = base64.b64decode(cloth.data)
+        upload_image(email, file_name=cloth.photo_id, file_data=image_data)
+
+
+    response = {
+        'message': 'Clothes added to DynamoDB and S3 successfully'
     }
 
     return jsonify(response), 200
