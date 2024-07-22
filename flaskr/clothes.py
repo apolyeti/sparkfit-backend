@@ -96,3 +96,22 @@ def add_clothes():
     }
 
     return jsonify(response), 200
+
+@bp.route('/get', methods=['POST'])
+def get_clothes():
+    """Get a user's clothes from the database"""
+
+    # get clothes from database, then get the images from S3
+    data = request.get_json()
+    email = data['email']
+
+    clothes = db.get_clothes(email)
+
+    for cloth in clothes:
+        cloth['data'] = base64.b64encode(cloth['data']).decode('utf-8')
+
+    response = {
+        'clothes': clothes
+    }
+
+    return jsonify(response), 200
