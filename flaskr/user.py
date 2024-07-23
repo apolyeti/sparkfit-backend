@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 
 import flaskr.aws.dynamo_handler as db
-from flaskr.classes import SparkFitUser
+from flaskr.utils.classes import SparkFitUser
 
 bp = Blueprint("user", __name__, url_prefix="/user")
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})

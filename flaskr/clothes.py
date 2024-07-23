@@ -12,7 +12,7 @@ from flaskr.aws.s3_session import (
     fetch_user_images,
     upload_image,
 )
-from flaskr.classes import SparkFitImage
+from flaskr.utils.classes import SparkFitImage
 
 bp = Blueprint("clothes", __name__, url_prefix="/clothes")
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
