@@ -6,8 +6,8 @@ from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from PIL import Image
 
-from flaskr.aws import dynamo_handler as db
-from flaskr.aws.s3_session import (
+from flaskr.aws import dynamo as db
+from flaskr.aws.s3 import (
     download_classification_model,
     fetch_user_images,
     upload_image,
