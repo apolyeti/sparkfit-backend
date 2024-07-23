@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-from typing import Optional, List
-
 class SparkFitImage:
     def __init__(self, photo_id, predicted_classes, file_name, data, fabric, color, fit, category, data_url=None):
         self.photo_id = photo_id

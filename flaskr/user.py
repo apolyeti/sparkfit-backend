@@ -5,7 +5,7 @@ from flask_cors import CORS # type: ignore
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
-import flaskr.dynamo_handler as db
+import flaskr.aws.dynamo_handler as db
 from flaskr.classes import SparkFitUser
 
 @bp.route('/add', methods=['POST'])

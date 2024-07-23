@@ -1,36 +1,33 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, request, jsonify
 )
-from flask_cors import CORS # type: ignore
-import tensorflow as tf
-from tensorflow.keras.models import load_model # type: ignore
-from tensorflow.keras.preprocessing import image # type: ignore
+from flask_cors import CORS 
 import numpy as np
 from PIL import Image
 import uuid
-
-import os
-import io
-import boto3
-import requests
 import base64
-
 from flaskr.classes import SparkFitImage
-from flaskr.s3_session import model, class_names, upload_image
-import flaskr.dynamo_handler as db
-
-print('\033[1;92m' + 'Model and class names loaded successfully!' + '\033[0m')
-# print(model.summary())
+from flaskr.aws.s3_session import download_classification_model, upload_image, fetch_user_images
+from flaskr.aws import dynamo_handler as db
 
 
 bp = Blueprint('clothes', __name__, url_prefix='/clothes')
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
+
+model = download_classification_model()
+
+print('\033[1;92m' + 'Model loaded successfully!' + '\033[0m')
 
 @bp.route('/classify', methods=['POST'])
 def classify():
     """Will receive a list of files """
     if 'files' not in request.files:
         return jsonify({'error': 'No files found in request'}), 400
+    
+    class_path = 'flaskr/utils/labels.txt'
+
+    with open(class_path, 'r') as f:
+        class_names = f.read().splitlines()
 
 
     files = request.files.getlist('files')
@@ -107,11 +104,25 @@ def get_clothes():
 
     clothes = db.get_clothes(email)
 
-    for cloth in clothes:
-        cloth['data'] = base64.b64encode(cloth['data']).decode('utf-8')
+    if not clothes:
+        return jsonify({'clothes': []}), 200
 
+    # now get images from s3
+    file_data = fetch_user_images(email)
+
+    for file in file_data:
+        # photo id is the file name before the .jpg
+        photo_id = file['file_name'].split('/')[-1].split('.')[0]
+        for cloth in clothes:
+            if cloth['photo_id'] == photo_id:
+                # give data url in base64
+                cloth['data_url'] = 'data:image/jpeg;base64,' + base64.b64encode(file['data']).decode('utf-8')
+                break
+        
+    
     response = {
         'clothes': clothes
     }
+
 
     return jsonify(response), 200

@@ -20,6 +20,7 @@ def getWeather():
         url = f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={lat},{lon}"
 
         response = requests.get(url)
+
         return response.json()
 
     if request.method == 'GET':
