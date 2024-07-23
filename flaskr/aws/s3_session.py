@@ -1,4 +1,3 @@
-import boto3
 import os
 from tensorflow.keras.models import load_model # type: ignore
 from flaskr.aws.config import get_aws_session

@@ -1,21 +1,22 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, request, jsonify
 )
-from flask_cors import CORS # type: ignore
-
-bp = Blueprint('user', __name__, url_prefix='/user')
-
+from flask_cors import CORS
 import flaskr.aws.dynamo_handler as db
 from flaskr.classes import SparkFitUser
+
+bp = Blueprint('user', __name__, url_prefix='/user')
+CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @bp.route('/add', methods=['POST'])
 def add_user():
     """Add a user to the database"""
     data = request.get_json()
-    email = data['email']
-    first_name = data['first_name']
-    last_name = data['last_name']
-    clothes = data['clothes']
+    
+    email       = data['email']
+    first_name  = data['first_name']
+    last_name   = data['last_name']
+    clothes     = data['clothes']
 
     new_user = SparkFitUser(first_name, last_name, email, clothes)
 
