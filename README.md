@@ -10,13 +10,19 @@ You will also need to configure your own AWS credentials (for DynamoDB and S3) i
 
 Unfortunately, the ML models are stored in a private S3 bucket, so you will not be able to access them. If you would like to test the backend locally, please reach out to me and I can provide you with the necessary files.
 
+Many libraries used in this project do not fully support Apple Silicon, if at all. Both AI libraries, PyTorch and Tensorflow, run into large troubles with M1, M2, etc.. chips, so running this project on a machine with x86 architecture is advised.
+
+Additionally, you wil not be able to use certain libraries without an Nvidia GPU, with its CUDA toolkit. The highest version of CUDA that PyTorch supports as of July 27th, 2024, is v12.4. Refer to the [PyTorch docs](https://pytorch.org/get-started/locally/) for more information and/or updates.
+
 ## Getting Started
 
 ### Prerequisites
 
 - Python 3.8+
-- pip
+- conda
+- pip (some libraries can only be downloaded by pip)
 - AWS CLI configured with your credentials
+- x86 machine with an Nvidia CUDA GPU (Libraries such as PyTorch, Transformers, and BitsAndBytes will not work without CUDA <=v12.4 support)
 
 ### Installation
 
@@ -37,7 +43,8 @@ Unfortunately, the ML models are stored in a private S3 bucket, so you will not 
 3. Install dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   conda env create -f environment.yml
+   conda activate myenv
    ```
 
 4. Run the development server:
