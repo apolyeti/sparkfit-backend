@@ -6,26 +6,12 @@ class SparkfitLLM:
         model_name = "arveenazhand/sparkfit-llm"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        # Check if a GPU is available
-        if torch.cuda.is_available():
-            from transformers import BitsAndBytesConfig
-            bnb_config = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_use_double_quant=True,
-                bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=torch.bfloat16
-            )
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                quantization_config=bnb_config,
-                device_map="auto",
-                trust_remote_code=True,
-            )
-        else:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                trust_remote_code=True,
-            )
+        # Load model without quantization settings, ensuring no GPU dependencies
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            trust_remote_code=True,
+            device_map="cpu"  # Explicitly set device map to CPU
+        )
 
     def generate_text(self, instruction, prompt):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
