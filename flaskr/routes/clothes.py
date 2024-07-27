@@ -12,7 +12,10 @@ from flaskr.aws.s3 import (
     fetch_user_images,
     upload_image,
 )
-from flaskr.utils.classes import SparkFitImage
+from flaskr.utils.classes import SparkFitImage, DynamoImage
+from flaskr.utils.sparkfit_llm import SparkfitLLM
+
+llm = SparkfitLLM()
 
 bp = Blueprint("clothes", __name__, url_prefix="/clothes")
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -122,3 +125,33 @@ def get_clothes():
     response = {"clothes": clothes}
 
     return jsonify(response), 200
+
+@bp.route("/outfit", methods=["POST"])
+def outfit():
+    """Will receive a list of
+    SparkfitImage objects
+    """
+
+    # send the photo_id, category, fabric, color, fit to the model
+
+    data = request.get_json()
+    email = data["email"]
+    clothes = data["clothes"]
+    temperature = data["temperature"]
+    condition = data["condition"]
+
+    # translate to DynamoImage objects
+    clothes = [DynamoImage(**cloth) for cloth in clothes]
+
+    prompt = ""
+
+    for cloth in clothes:
+        prompt += f"{cloth.photo_id}, {cloth.color}, {cloth.fabric}, {cloth.fit}, {cloth.category}; "
+
+    prompt += f"Weather: {temperature}, {condition}"
+
+    response = llm.generate_text(prompt)
+
+    print(response)
+
+

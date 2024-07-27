@@ -39,7 +39,11 @@ class SparkfitLLM:
             self.quantized = False
         print("Model loaded")
 
-    def generate_text(self, instruction, prompt):
+    def generate_text(self, prompt):
+
+        with open("prompt.txt", "r") as f:
+            instruction = f.read()
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if not self.quantized:
             self.model.to(device)
