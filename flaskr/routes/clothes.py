@@ -1,5 +1,6 @@
 import base64
 import uuid
+import threading
 
 import numpy as np
 from flask import Blueprint, jsonify, request
@@ -16,6 +17,11 @@ from flaskr.utils.classes import SparkFitImage, DynamoImage
 from flaskr.utils.sparkfit_llm import SparkfitLLM
 
 llm = SparkfitLLM()
+
+def load_model():
+    llm.load_model()
+
+threading.Thread(target=load_model).start()
 
 bp = Blueprint("clothes", __name__, url_prefix="/clothes")
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -149,6 +155,10 @@ def outfit():
         prompt += f"{cloth.photo_id}, {cloth.color}, {cloth.fabric}, {cloth.fit}, {cloth.category}; "
 
     prompt += f"Weather: {temperature}, {condition}"
+
+    # check if the model is loaded
+    while not llm.is_loaded:
+        pass
 
     response = llm.generate_text(prompt)
 

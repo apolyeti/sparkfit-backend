@@ -3,7 +3,14 @@ import torch
 import os
 
 class SparkfitLLM:
+
     def __init__(self):
+        self.tokenizer = None
+        self.model = None
+        self.quantized = False
+        self.is_loaded = False
+
+    def load_model(self):
         model_name = "arveenazhand/sparkfit-llm"
         token = os.getenv("HUGGINGFACE_HUB_TOKEN")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
@@ -37,6 +44,8 @@ class SparkfitLLM:
                 token=token,
             )
             self.quantized = False
+        
+        self.is_loaded = True
         print("Model loaded")
 
     def generate_text(self, prompt):
