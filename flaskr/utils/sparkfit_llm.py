@@ -9,11 +9,15 @@ class SparkfitLLM:
         self.model = None
         self.quantized = False
         self.is_loaded = False
+        self.instruction = None
 
     def load_model(self):
         model_name = "arveenazhand/sparkfit-llm"
         token = os.getenv("HUGGINGFACE_HUB_TOKEN")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
+
+        with open("flaskr/utils/prompt.txt", "r") as f:
+            self.instruction = f.read()
 
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({'pad_token': self.tokenizer.eos_token})
@@ -50,14 +54,11 @@ class SparkfitLLM:
 
     def generate_text(self, prompt):
 
-        with open("flaskr/utils/prompt.txt", "r") as f:
-            instruction = f.read()
-
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if not self.quantized:
             self.model.to(device)
 
-        full_prompt = f"{instruction}\n{prompt}"
+        full_prompt = f"{self.instruction}\n{prompt}"
         # print(f"Full prompt: {full_prompt}")
 
         inputs = self.tokenizer(full_prompt, return_tensors="pt", max_length=2048, truncation=True, padding=True)
