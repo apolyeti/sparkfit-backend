@@ -1,5 +1,6 @@
 import base64
 import uuid
+import threading
 
 import numpy as np
 from flask import Blueprint, jsonify, request
@@ -12,7 +13,16 @@ from flaskr.aws.s3 import (
     fetch_user_images,
     upload_image,
 )
-from flaskr.utils.classes import SparkFitImage
+from flaskr.utils.classes import SparkFitImage, DynamoImage
+from flaskr.utils.sparkfit_llm import SparkfitLLM
+
+llm = SparkfitLLM()
+
+def load_model():
+    llm.load_model()
+    print("\033[1;92m" + "Sparkfit-LLM loaded successfully!" + "\033[0m")
+
+threading.Thread(target=load_model).start()
 
 bp = Blueprint("clothes", __name__, url_prefix="/clothes")
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -122,3 +132,43 @@ def get_clothes():
     response = {"clothes": clothes}
 
     return jsonify(response), 200
+
+@bp.route("/outfit", methods=["POST"])
+def outfit():
+    """Will receive a list of
+    SparkfitImage objects
+    """
+
+    print("Outfit request received")
+
+    # send the photo_id, category, fabric, color, fit to the model
+
+    data = request.get_json()
+    clothes = data["clothes"]
+    temperature = data["temperature"]
+    condition = data["condition"]
+
+    # translate to DynamoImage objects
+    clothes = [DynamoImage(**cloth) for cloth in clothes]
+
+
+
+    prompt = "\nYour Prompt:\n"
+
+    for cloth in clothes:
+        prompt += f"{cloth.photo_id}, {cloth.color}, {cloth.fabric}, {cloth.fit}, {cloth.category}; "
+
+    prompt += f"Weather: {temperature}, {condition}"
+
+    # check if the model is loaded
+    while not llm.is_loaded:
+        pass
+
+
+
+    response = llm.generate_text(prompt)
+    print(response)
+
+    return jsonify({"success": True}), 200
+
+
