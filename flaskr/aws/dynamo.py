@@ -1,8 +1,6 @@
 import os
 from typing import List
 
-import boto3
-
 from flaskr.aws.config import get_aws_session
 from flaskr.utils.classes import SparkFitImage, SparkFitUser
 

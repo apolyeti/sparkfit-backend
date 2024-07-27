@@ -10,7 +10,11 @@ s3 = session.client("s3")
 
 
 def download_classification_model():
-    local_file_path = "flaskr/aws/downloads/models/classify_clothes.keras"
+
+    # Download the model from S3 if it doesn't exist locally
+    # need to account for windows and linux file paths
+    local_file_path = os.path.join('flaskr', 'aws', 'downloads', 'models', 'classify_clothes.keras')
+    
     bucket_name = "sparkfit"
     object_key = "models/classify_clothes.keras"
     if not os.path.exists(local_file_path):

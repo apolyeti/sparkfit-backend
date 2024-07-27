@@ -48,3 +48,22 @@ class SparkFitUser:
             "email": self.email,
             "clothes": [item.to_dict() for item in self.clothes],
         }
+
+class DynamoImage:
+    def __init__(self, photo_id, category, file_name, fabric, color, fit):
+        self.photo_id = photo_id
+        self.category = category
+        self.file_name = file_name
+        self.fabric = fabric
+        self.color = color
+        self.fit = fit
+
+    def to_dict(self):
+        return {
+            "photo_id": self.photo_id,
+            "category": self.category,
+            "file_name": self.file_name,
+            "fabric": self.fabric,
+            "color": self.color,
+            "fit": self.fit,
+        }
