@@ -50,7 +50,7 @@ class SparkfitLLM:
 
     def generate_text(self, prompt):
 
-        with open("prompt.txt", "r") as f:
+        with open("flaskr/utils/prompt.txt", "r") as f:
             instruction = f.read()
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -60,19 +60,19 @@ class SparkfitLLM:
         full_prompt = f"{instruction}\n{prompt}"
         # print(f"Full prompt: {full_prompt}")
 
-        inputs = self.tokenizer(full_prompt, return_tensors="pt", max_length=1024, truncation=True, padding=True)
+        inputs = self.tokenizer(full_prompt, return_tensors="pt", max_length=2048, truncation=True, padding=True)
         if not self.quantized:
             inputs = {key: value.to(device) for key, value in inputs.items()}
-        print("Inputs prepared")
+
 
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_length=8192,
+                max_length=2048,
                 pad_token_id=self.tokenizer.eos_token_id
             )
-        print("Output generated")
+
 
         response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        print(f"Response: {response}")
+
         return response

@@ -20,6 +20,7 @@ llm = SparkfitLLM()
 
 def load_model():
     llm.load_model()
+    print("\033[1;92m" + "Sparkfit-LLM loaded successfully!" + "\033[0m")
 
 threading.Thread(target=load_model).start()
 
@@ -138,10 +139,11 @@ def outfit():
     SparkfitImage objects
     """
 
+    print("Outfit request received")
+
     # send the photo_id, category, fabric, color, fit to the model
 
     data = request.get_json()
-    email = data["email"]
     clothes = data["clothes"]
     temperature = data["temperature"]
     condition = data["condition"]
@@ -149,7 +151,9 @@ def outfit():
     # translate to DynamoImage objects
     clothes = [DynamoImage(**cloth) for cloth in clothes]
 
-    prompt = ""
+
+
+    prompt = "\nYour Prompt:\n"
 
     for cloth in clothes:
         prompt += f"{cloth.photo_id}, {cloth.color}, {cloth.fabric}, {cloth.fit}, {cloth.category}; "
@@ -160,8 +164,11 @@ def outfit():
     while not llm.is_loaded:
         pass
 
-    response = llm.generate_text(prompt)
 
+
+    response = llm.generate_text(prompt)
     print(response)
+
+    return jsonify({"success": True}), 200
 
 
