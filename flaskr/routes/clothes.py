@@ -6,6 +6,7 @@ import numpy as np
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from PIL import Image
+import json
 
 from flaskr.aws import dynamo as db
 from flaskr.aws.s3 import (
@@ -153,12 +154,16 @@ def outfit():
 
 
 
-    prompt = "\nYour Prompt:\n"
+    # prompt = "\nYour Prompt:\n"
+
+    prompt = ""
 
     for cloth in clothes:
         prompt += f"{cloth.photo_id}, {cloth.color}, {cloth.fabric}, {cloth.fit}, {cloth.category}; "
 
     prompt += f"Weather: {temperature}, {condition}"
+
+    prompt += "\nYour Response:\n"
 
     # check if the model is loaded
     while not llm.is_loaded:
@@ -167,8 +172,12 @@ def outfit():
 
 
     response = llm.generate_text(prompt)
-    print(response)
+    
+    # the string is in json format, so we need to convert it to a dictionary and return that as the response
+    response_dict = json.loads(response)
 
-    return jsonify({"success": True}), 200
+    return jsonify(response_dict), 200
+    # return jsonify({"test": "asdas"}), 200
+    
 
 

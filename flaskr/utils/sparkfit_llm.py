@@ -76,4 +76,8 @@ class SparkfitLLM:
 
         response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
+        if full_prompt in response:
+            response = response.split(full_prompt)[1].strip()
+
         return response
+
