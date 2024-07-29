@@ -177,6 +177,8 @@ def outfit():
     # the string is in json format, so we need to convert it to a dictionary and return that as the response
     response_dict = json.loads(generate)
 
+    print(len(response_dict["choices"]))
+
     image_files = fetch_user_images(email)
 
     response = {"choices": []}
@@ -190,7 +192,8 @@ def outfit():
                         file["data"]
                     ).decode("utf-8")
                     break
-            response["choices"].append(choice)
+    
+    response["choices"] = response_dict["choices"]
     
     
     return jsonify(response), 200
