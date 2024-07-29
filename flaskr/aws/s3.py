@@ -49,15 +49,6 @@ def fetch_user_images(email):
 
     return image_files
 
-def fetch_single_image(email, file_name):
-    subdir_name = email.split("@")[0]
-    object_key = f"images/{subdir_name}/{file_name}.jpg"
-    bucket_name = "sparkfit"
-
-    response = s3.get_object(Bucket=bucket_name, Key=object_key)
-    file_data = response["Body"].read()
-
-    return file_data
 
 
 def upload_image(email, file_name, file_data):
