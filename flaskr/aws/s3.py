@@ -50,6 +50,7 @@ def fetch_user_images(email):
     return image_files
 
 
+
 def upload_image(email, file_name, file_data):
     subdir_name = email.split("@")[0]
     object_key = f"images/{subdir_name}/{file_name}.jpg"

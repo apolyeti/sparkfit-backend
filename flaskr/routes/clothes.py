@@ -145,6 +145,7 @@ def outfit():
     # send the photo_id, category, fabric, color, fit to the model
 
     data = request.get_json()
+    email = data["email"]
     clothes = data["clothes"]
     temperature = data["temperature"]
     condition = data["condition"]
@@ -171,13 +172,31 @@ def outfit():
 
 
 
-    response = llm.generate_text(prompt)
+    generate = llm.generate_text(prompt)
     
     # the string is in json format, so we need to convert it to a dictionary and return that as the response
-    response_dict = json.loads(response)
+    response_dict = json.loads(generate)
 
-    return jsonify(response_dict), 200
-    # return jsonify({"test": "asdas"}), 200
+    print(len(response_dict["choices"]))
+
+    image_files = fetch_user_images(email)
+
+    response = {"choices": []}
+
+    for file in image_files:
+        photo_id = file["file_name"].split("/")[-1].split(".")[0]
+        for choice in response_dict["choices"]:
+            for clothing_item in choice["outfit"]:
+                if clothing_item["photo_id"] == photo_id:
+                    clothing_item["data_url"] = "data:image/jpeg;base64," + base64.b64encode(
+                        file["data"]
+                    ).decode("utf-8")
+                    break
+    
+    response["choices"] = response_dict["choices"]
+    
+    
+    return jsonify(response), 200
     
 
 

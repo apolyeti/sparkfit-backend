@@ -50,13 +50,14 @@ class SparkFitUser:
         }
 
 class DynamoImage:
-    def __init__(self, photo_id, category, file_name, fabric, color, fit):
+    def __init__(self, photo_id, category, file_name, fabric, color, fit, data_url):
         self.photo_id = photo_id
         self.category = category
         self.file_name = file_name
         self.fabric = fabric
         self.color = color
         self.fit = fit
+        self.data_url = data_url
 
     def to_dict(self):
         return {
@@ -66,4 +67,5 @@ class DynamoImage:
             "fabric": self.fabric,
             "color": self.color,
             "fit": self.fit,
+            "data_url": self.data_url,
         }
