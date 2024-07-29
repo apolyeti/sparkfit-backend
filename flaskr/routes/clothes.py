@@ -194,11 +194,6 @@ def outfit():
     
     
     return jsonify(response), 200
-
-
-    
-
-    # return jsonify({"test": "asdas"}), 200
     
 
 
