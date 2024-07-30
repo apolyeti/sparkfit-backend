@@ -183,19 +183,53 @@ def outfit():
 
     response = {"choices": []}
 
-    for file in image_files:
-        photo_id = file["file_name"].split("/")[-1].split(".")[0]
-        for choice in response_dict["choices"]:
-            for clothing_item in choice["outfit"]:
+    outfits = {
+        "outfit": [],
+        "temperature": temperature,
+        "condition": condition
+    }
+
+    for choice in response_dict["choices"]:
+        outfit = {
+            "reasoning": choice.get("reasoning", ""),
+            "clothes": []
+        }
+        for clothing_item in choice["outfit"]:
+            item = {
+                "photo_id": clothing_item.get("photo_id", ""),
+                "fabric": clothing_item.get("fabric", ""),
+                "color": clothing_item.get("color", ""),
+                "fit": clothing_item.get("fit", ""),
+                "category": clothing_item.get("category", ""),
+            }
+            for file in image_files:
+                photo_id = file["file_name"].split("/")[-1].split(".")[0]
                 if clothing_item["photo_id"] == photo_id:
-                    clothing_item["data_url"] = "data:image/jpeg;base64," + base64.b64encode(
-                        file["data"]
-                    ).decode("utf-8")
+                    item["data_url"] = "data:image/jpeg;base64," + base64.b64encode(file["data"]).decode("utf-8")
                     break
+            outfit["clothes"].append(item)
+        outfits["outfit"].append(outfit)
+
+    # Create a copy of outfits without the data_url for DynamoDB storage
+    outfits_without_data_url = {
+        "outfit": [],
+        "temperature": temperature,
+        "condition": condition
+    }
+    for outfit in outfits["outfit"]:
+        outfit_copy = {
+            "reasoning": outfit["reasoning"],
+            "clothes": []
+        }
+        for clothing_item in outfit["clothes"]:
+            item_copy = {k: v for k, v in clothing_item.items() if k != "data_url"}
+            outfit_copy["clothes"].append(item_copy)
+        outfits_without_data_url["outfit"].append(outfit_copy)
+
+    db.add_outfit(email, [outfits_without_data_url])
     
     response["choices"] = response_dict["choices"]
-    
-    
+
     return jsonify(response), 200
     
 
