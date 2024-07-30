@@ -119,15 +119,15 @@ def get_clothes():
     # now get images from s3
     file_data = fetch_user_images(email)
 
+    email = email.split("@")[0]
+
     for file in file_data:
         # photo id is the file name before the .jpg
         photo_id = file["file_name"].split("/")[-1].split(".")[0]
         for cloth in clothes:
             if cloth["photo_id"] == photo_id:
                 # give data url in base64
-                cloth["data_url"] = "data:image/jpeg;base64," + base64.b64encode(
-                    file["data"]
-                ).decode("utf-8")
+                cloth["data_url"] = "https://d1kqmt6gl9p8lg.cloudfront.net/images/" + email + "/" + photo_id + ".jpg"
                 break
 
     response = {"clothes": clothes}
@@ -175,27 +175,16 @@ def outfit():
     generate = llm.generate_text(prompt)
     
     # the string is in json format, so we need to convert it to a dictionary and return that as the response
-    response_dict = json.loads(generate)
+    response = json.loads(generate)
 
-    print(len(response_dict["choices"]))
+    print("Sparkfit produced", len(response["choices"]), "outfit choices")
 
-    image_files = fetch_user_images(email)
-
-    response = {"choices": []}
-
-    for file in image_files:
-        photo_id = file["file_name"].split("/")[-1].split(".")[0]
-        for choice in response_dict["choices"]:
-            for clothing_item in choice["outfit"]:
-                if clothing_item["photo_id"] == photo_id:
-                    clothing_item["data_url"] = "data:image/jpeg;base64," + base64.b64encode(
-                        file["data"]
-                    ).decode("utf-8")
-                    break
+    for choice in response["choices"]:
+        for item in choice["outfit"]:
+            item["data_url"] = "https://d1kqmt6gl9p8lg.cloudfront.net/images/" + email.split("@")[0] + "/" + item["photo_id"] + ".jpg"
     
-    response["choices"] = response_dict["choices"]
-    
-    
+    db.add_outfit(email, response["choices"])
+
     return jsonify(response), 200
     
 

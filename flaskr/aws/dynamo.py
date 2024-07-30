@@ -25,6 +25,7 @@ def add_user(user: SparkFitUser):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "clothes": user.clothes,
+            "outfits": [],
         }
     )
     return response
@@ -90,4 +91,15 @@ def clear_user_closet(email: str):
         ExpressionAttributeValues={":empty_list": []},
         ReturnValues="UPDATED_NEW",
     )
+    return response
+
+def add_outfit(email, outfits):
+    table = dynamodb.Table("users")
+    response = table.update_item(
+        Key={"email": email},
+        UpdateExpression="SET outfits = list_append(if_not_exists(outfits, :empty_list), :o)",
+        ExpressionAttributeValues={":o": outfits, ":empty_list": []},
+        ReturnValues="UPDATED_NEW",
+    )
+
     return response
