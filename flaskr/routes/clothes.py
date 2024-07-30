@@ -119,15 +119,15 @@ def get_clothes():
     # now get images from s3
     file_data = fetch_user_images(email)
 
+    email = email.split("@")[0]
+
     for file in file_data:
         # photo id is the file name before the .jpg
         photo_id = file["file_name"].split("/")[-1].split(".")[0]
         for cloth in clothes:
             if cloth["photo_id"] == photo_id:
                 # give data url in base64
-                cloth["data_url"] = "data:image/jpeg;base64," + base64.b64encode(
-                    file["data"]
-                ).decode("utf-8")
+                cloth["data_url"] = "https://d1kqmt6gl9p8lg.cloudfront.net/images/" + email + "/" + photo_id + ".jpg"
                 break
 
     response = {"clothes": clothes}
@@ -175,60 +175,15 @@ def outfit():
     generate = llm.generate_text(prompt)
     
     # the string is in json format, so we need to convert it to a dictionary and return that as the response
-    response_dict = json.loads(generate)
+    response = json.loads(generate)
 
-    print(len(response_dict["choices"]))
+    print("Sparkfit produced", len(response["choices"]), "outfit choices")
 
-    image_files = fetch_user_images(email)
-
-    response = {"choices": []}
-
-    outfits = {
-        "outfit": [],
-        "temperature": temperature,
-        "condition": condition
-    }
-
-    for choice in response_dict["choices"]:
-        outfit = {
-            "reasoning": choice.get("reasoning", ""),
-            "clothes": []
-        }
-        for clothing_item in choice["outfit"]:
-            item = {
-                "photo_id": clothing_item.get("photo_id", ""),
-                "fabric": clothing_item.get("fabric", ""),
-                "color": clothing_item.get("color", ""),
-                "fit": clothing_item.get("fit", ""),
-                "category": clothing_item.get("category", ""),
-            }
-            for file in image_files:
-                photo_id = file["file_name"].split("/")[-1].split(".")[0]
-                if clothing_item["photo_id"] == photo_id:
-                    item["data_url"] = "data:image/jpeg;base64," + base64.b64encode(file["data"]).decode("utf-8")
-                    break
-            outfit["clothes"].append(item)
-        outfits["outfit"].append(outfit)
-
-    # Create a copy of outfits without the data_url for DynamoDB storage
-    outfits_without_data_url = {
-        "outfit": [],
-        "temperature": temperature,
-        "condition": condition
-    }
-    for outfit in outfits["outfit"]:
-        outfit_copy = {
-            "reasoning": outfit["reasoning"],
-            "clothes": []
-        }
-        for clothing_item in outfit["clothes"]:
-            item_copy = {k: v for k, v in clothing_item.items() if k != "data_url"}
-            outfit_copy["clothes"].append(item_copy)
-        outfits_without_data_url["outfit"].append(outfit_copy)
-
-    db.add_outfit(email, [outfits_without_data_url])
+    for choice in response["choices"]:
+        for item in choice["outfit"]:
+            item["data_url"] = "https://d1kqmt6gl9p8lg.cloudfront.net/images/" + email.split("@")[0] + "/" + item["photo_id"] + ".jpg"
     
-    response["choices"] = response_dict["choices"]
+    db.add_outfit(email, response["choices"])
 
     return jsonify(response), 200
     
