@@ -134,6 +134,20 @@ def get_clothes():
 
     return jsonify(response), 200
 
+@bp.route("/delete", methods=["POST"])
+def delete_clothes():
+    """Delete a user's clothes from the database"""
+
+    data = request.get_json()
+    email = data["email"]
+    photo_id = data["photo_id"]
+
+    db.delete_clothes(email, photo_id)
+
+    response = {"message": "Clothes deleted from DynamoDB successfully"}
+
+    return jsonify(response), 200
+
 @bp.route("/outfit", methods=["POST"])
 def outfit():
     """Will receive a list of

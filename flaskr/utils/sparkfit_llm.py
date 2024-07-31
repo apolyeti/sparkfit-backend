@@ -82,6 +82,3 @@ class SparkfitLLM:
 
         return response
     
-    def generate_better_text(self, prompt):
-        
-
