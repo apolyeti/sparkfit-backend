@@ -1,5 +1,5 @@
 import os
-
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 from tensorflow.keras.models import load_model  # type: ignore
 
 from flaskr.aws.config import get_aws_session
