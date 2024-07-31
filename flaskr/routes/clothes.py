@@ -172,7 +172,7 @@ def outfit():
 
 
 
-    generate = llm.generate_text(prompt)
+    generate = llm.generate_better_text(prompt)
     
     # the string is in json format, so we need to convert it to a dictionary and return that as the response
     response = json.loads(generate)

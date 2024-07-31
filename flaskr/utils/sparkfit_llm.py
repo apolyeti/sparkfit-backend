@@ -1,6 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import os
+from openai import OpenAI
 
 class SparkfitLLM:
 
@@ -12,45 +13,49 @@ class SparkfitLLM:
         self.instruction = None
 
     def load_model(self):
-        model_name = "arveenazhand/sparkfit-llm"
-        token = os.getenv("HUGGINGFACE_HUB_TOKEN")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
+        # model_name = "arveenazhand/sparkfit-llm"
+        # token = os.getenv("HUGGINGFACE_HUB_TOKEN")
+        # self.tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
 
         with open("flaskr/utils/prompt.txt", "r") as f:
             self.instruction = f.read()
 
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.add_special_tokens({'pad_token': self.tokenizer.eos_token})
+        # if self.tokenizer.pad_token is None:
+        #     self.tokenizer.add_special_tokens({'pad_token': self.tokenizer.eos_token})
 
-        print("Tokenizer loaded")
+        # print("Tokenizer loaded")
 
-        # Check if a GPU is available
-        if torch.cuda.is_available():
-            from transformers import BitsAndBytesConfig
-            bnb_config = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_use_double_quant=True,
-                bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=torch.bfloat16
-            )
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                quantization_config=bnb_config,
-                device_map="auto",
-                trust_remote_code=True,
-                token=token,
-            )
-            self.quantized = True
-        else:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                trust_remote_code=True,
-                token=token,
-            )
-            self.quantized = False
+        # # Check if a GPU is available
+        # if torch.cuda.is_available():
+        #     from transformers import BitsAndBytesConfig
+        #     bnb_config = BitsAndBytesConfig(
+        #         load_in_4bit=True,
+        #         bnb_4bit_use_double_quant=True,
+        #         bnb_4bit_quant_type="nf4",
+        #         bnb_4bit_compute_dtype=torch.bfloat16
+        #     )
+        #     self.model = AutoModelForCausalLM.from_pretrained(
+        #         model_name,
+        #         quantization_config=bnb_config,
+        #         device_map="auto",
+        #         trust_remote_code=True,
+        #         token=token,
+        #     )
+        #     self.quantized = True
+        # else:
+        #     self.model = AutoModelForCausalLM.from_pretrained(
+        #         model_name,
+        #         trust_remote_code=True,
+        #         token=token,
+        #     )
+        #     self.quantized = False
         
         self.is_loaded = True
+        # print("Model loaded")
+
+        self.model = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         print("Model loaded")
+
 
     def generate_text(self, prompt):
         print(prompt)
@@ -83,5 +88,16 @@ class SparkfitLLM:
         return response
     
     def generate_better_text(self, prompt):
-        
+        print('am i even here')
+        completion = self.model.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": self.instruction},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        response = completion.choices[0].message.content
+        print(f"Response: {response}")
+        return response
 
