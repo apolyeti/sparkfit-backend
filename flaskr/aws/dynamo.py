@@ -141,3 +141,34 @@ def delete_clothing_item(email, photo_id):
     )
 
     return response
+
+def update_clothes(email, cloth):
+    cloth = {
+            "photo_id": cloth["photo_id"],
+            "category": cloth["category"],
+            "file_name": cloth["file_name"],
+            "fabric": cloth["fabric"],
+            "color": cloth["color"],
+            "fit": cloth["fit"],
+        }
+
+
+    table = dynamodb.Table("users")
+    # find which clothing item to update
+    response = table.get_item(Key={"email": email})
+    clothes = response["Item"]["clothes"]
+    index = None
+    for i, c in enumerate(clothes):
+        if c["photo_id"] == cloth["photo_id"]:
+            index = i
+            break
+
+    if index is None:
+        raise ValueError("Clothing item not found")
+    
+    response = table.update_item(
+        Key={"email": email},
+        UpdateExpression=f"SET clothes[{index}] = :c",
+        ExpressionAttributeValues={":c": cloth},
+        ReturnValues="UPDATED_NEW",
+    )

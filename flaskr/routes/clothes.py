@@ -148,6 +148,21 @@ def delete_clothes():
 
     return jsonify(response), 200
 
+@bp.route("/update", methods=["POST"])
+def update_clothes():
+    """Update a user's clothes in the database"""
+
+    data = request.get_json()
+    email = data["email"]
+    cloth = data["updatedItem"]
+
+    db.update_clothes(email, cloth)
+
+    response = {"message": "Clothes updated in DynamoDB successfully"}
+
+    return jsonify(response), 200
+
+
 @bp.route("/outfit", methods=["POST"])
 def outfit():
     """Will receive a list of
