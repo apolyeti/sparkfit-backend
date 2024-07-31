@@ -3,6 +3,7 @@ from typing import List
 
 from flaskr.aws.config import get_aws_session
 from flaskr.utils.classes import SparkFitImage, SparkFitUser
+from boto3.dynamodb.conditions import Attr
 
 session = get_aws_session()
 
@@ -66,14 +67,41 @@ def add_clothes(email: str, clothes: List[SparkFitImage]):
     return response
 
 
-def delete_clothes(email: str, clothes: SparkFitImage):
+def delete_clothes(email: str, photo_id: str):
     table = dynamodb.Table("users")
-    response = table.update_item(
-        Key={"email": email},
-        UpdateExpression="REMOVE clothes[:c]",
-        ExpressionAttributeValues={":c": clothes},
+
+    # Retrieve the item
+    response = table.get_item(
+        Key={"email": email}
     )
-    return response
+
+    if 'Item' in response:
+        user_data = response['Item']
+        if 'clothes' in user_data:
+            clothes = user_data['clothes']
+            
+            # Find the index of the item to remove
+            index_to_remove = None
+            for index, item in enumerate(clothes):
+                if item['photo_id'] == photo_id:
+                    index_to_remove = index
+                    break
+
+            if index_to_remove is not None:
+                # Remove the item at the found index
+                response = table.update_item(
+                    Key={"email": email},
+                    UpdateExpression=f"REMOVE clothes[{index_to_remove}]",
+                    ConditionExpression=Attr('clothes').size().gt(index_to_remove),
+                    ReturnValues="UPDATED_NEW"
+                )
+                print("Clothes item removed successfully:", response)
+            else:
+                print("Photo ID not found in clothes list.")
+        else:
+            print("No clothes found for the user.")
+    else:
+        print("User not found.")
 
 
 def get_clothes(email: str):
@@ -100,6 +128,16 @@ def add_outfit(email, outfits):
         UpdateExpression="SET outfits = list_append(if_not_exists(outfits, :empty_list), :o)",
         ExpressionAttributeValues={":o": outfits, ":empty_list": []},
         ReturnValues="UPDATED_NEW",
+    )
+
+    return response
+
+def delete_clothing_item(email, photo_id):
+    table = dynamodb.Table("users")
+    response = table.update_item(
+        Key={"email": email},
+        UpdateExpression="REMOVE clothes[:c]",
+        ExpressionAttributeValues={":c": photo_id},
     )
 
     return response
