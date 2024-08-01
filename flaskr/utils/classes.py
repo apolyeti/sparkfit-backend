@@ -1,4 +1,7 @@
 class SparkFitImage:
+    """
+    Class to represent a clothing item that is uploaded by the user.
+    """
     def __init__(
         self,
         photo_id,
@@ -34,6 +37,9 @@ class SparkFitImage:
 
 
 class SparkFitUser:
+    """
+    Class to represent a user in the application.
+    """
 
     def __init__(self, first_name, last_name, email, clothes):
         self.first_name = first_name
@@ -50,6 +56,12 @@ class SparkFitUser:
         }
 
 class DynamoImage:
+    """
+    Class to represent a clothing item that is stored in DynamoDB.
+    Differences from SparkFitImage:
+    - Does not have the data attribute
+    - Does not have the predicted_classes attribute
+    """
     def __init__(self, photo_id, category, file_name, fabric, color, fit, data_url):
         self.photo_id = photo_id
         self.category = category
