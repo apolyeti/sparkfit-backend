@@ -51,7 +51,6 @@ class SparkfitLLM:
         #     self.quantized = False
         
         self.is_loaded = True
-        # print("Model loaded")
 
         self.model = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         print("Model loaded")
