@@ -53,7 +53,6 @@ class SparkfitLLM:
         self.is_loaded = True
 
         self.model = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        print("Model loaded")
 
 
     def generate_text(self, prompt):
@@ -87,7 +86,6 @@ class SparkfitLLM:
         return response
     
     def generate_better_text(self, prompt):
-        print('am i even here')
         completion = self.model.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -97,6 +95,5 @@ class SparkfitLLM:
         )
 
         response = completion.choices[0].message.content
-        print(f"Response: {response}")
         return response
 
