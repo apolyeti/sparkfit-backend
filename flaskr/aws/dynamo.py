@@ -1,3 +1,17 @@
+"""
+This module contains functions to interact with the DynamoDB table, using the configuration from the `config` module.
+
+Functions:
+    add_user: Adds a user to the DynamoDB table.
+    get_user: Retrieves a user from the DynamoDB table.
+    add_clothes: Adds clothing items to the user's closet in the DynamoDB table.
+    get_clothes: Retrieves the clothing items from the user's closet in the DynamoDB table.
+    clear_user_closet: Clears the user's closet in the DynamoDB table.
+    add_outfit: Adds outfits to the user's outfit list in the DynamoDB table.
+    delete_clothing_item: Deletes a clothing item from the user's closet in the DynamoDB table.
+    update_clothes: Updates a clothing item in the user's closet in the DynamoDB table.
+"""
+
 import os
 from typing import List
 
@@ -10,7 +24,16 @@ session = get_aws_session()
 dynamodb = session.resource("dynamodb")
 
 
-def add_user(user: SparkFitUser):
+def add_user(user: SparkFitUser) -> dict:
+    """
+    Adds a user to the DynamoDB table. If the user already exists, the function will exit.
+
+    Parameters:
+        user (SparkFitUser): The user to add to the table.
+    
+    Returns:
+        dict: The response from the DynamoDB table.
+    """
     table = dynamodb.Table("users")
 
     # check if user already exists, if so, exit function
@@ -32,13 +55,32 @@ def add_user(user: SparkFitUser):
     return response
 
 
-def get_user(email: str):
+def get_user(email: str) -> dict:
+    """
+    Retrieves a user from the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user to retrieve.
+
+    Returns:
+        dict: The user data retrieved from the DynamoDB table.
+    """
     table = dynamodb.Table("users")
     response = table.get_item(Key={"email": email})
     return response["Item"]
 
 
-def add_clothes(email: str, clothes: List[SparkFitImage]):
+def add_clothes(email: str, clothes: List[SparkFitImage]) -> dict:
+    """
+    Adds clothing items to the user's closet in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+        clothes (List[SparkFitImage]): The list of clothing items to add to the user's closet.
+
+    Returns:
+        dict: The response from the DynamoDB table.
+    """
     for cloth in clothes:
         if not cloth.photo_id:
             raise ValueError("photo_id is required for each clothing item")
@@ -67,7 +109,15 @@ def add_clothes(email: str, clothes: List[SparkFitImage]):
     return response
 
 
-def delete_clothes(email: str, photo_id: str):
+def delete_clothes(email: str, photo_id: str) -> None:
+    """
+    Deletes a clothing item from the user's closet in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+        photo_id (str): The photo ID of the clothing item to delete.
+    """
+
     table = dynamodb.Table("users")
 
     # Retrieve the item
@@ -104,14 +154,32 @@ def delete_clothes(email: str, photo_id: str):
         print("User not found.")
 
 
-def get_clothes(email: str):
+def get_clothes(email: str) -> List[dict]:
+    """
+    Retrieves the clothing items from the user's closet in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+
+    Returns:
+        List[dict]: The list of clothing items in the user's closet.
+    """
     table = dynamodb.Table("users")
     response = table.get_item(Key={"email": email})
     print(response["Item"]["clothes"])
     return response["Item"]["clothes"]
 
 
-def clear_user_closet(email: str):
+def clear_user_closet(email: str) -> dict:
+    """
+    Clears the user's closet in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+
+    Returns:
+        dict: The response from the DynamoDB table.
+    """
     table = dynamodb.Table("users")
     response = table.update_item(
         Key={"email": email},
@@ -121,7 +189,17 @@ def clear_user_closet(email: str):
     )
     return response
 
-def add_outfit(email, outfits):
+def add_outfit(email, outfits) -> dict:
+    """
+    Adds outfits to the user's outfit list in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+        outfits (List[str]): The list of outfit IDs to add to the user's outfit list.
+
+    Returns:
+        dict: The response from the DynamoDB table.
+    """
     table = dynamodb.Table("users")
     response = table.update_item(
         Key={"email": email},
@@ -132,7 +210,17 @@ def add_outfit(email, outfits):
 
     return response
 
-def delete_clothing_item(email, photo_id):
+def delete_clothing_item(email, photo_id) -> dict:
+    """
+    Deletes a clothing item from the user's closet in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+        photo_id (str): The photo ID of the clothing item to delete.
+
+    Returns:
+        dict: The response from the DynamoDB table.
+    """
     table = dynamodb.Table("users")
     response = table.update_item(
         Key={"email": email},
@@ -142,7 +230,17 @@ def delete_clothing_item(email, photo_id):
 
     return response
 
-def update_clothes(email, cloth):
+def update_clothes(email, cloth) -> None:
+    """
+    Updates a clothing item in the user's closet in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+        cloth (dict): The updated clothing item.
+
+    Raises:
+        ValueError: If the clothing item is not found.
+    """
     cloth = {
             "photo_id": cloth["photo_id"],
             "category": cloth["category"],

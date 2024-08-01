@@ -10,7 +10,18 @@ CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @bp.route("/add", methods=["POST"])
 def add_user():
-    """Add a user to the database"""
+    """
+    Add a user to the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+        first_name (str): The first name of the user.
+        last_name (str): The last name of the user.
+        clothes (list): A list of clothing items the user has.
+
+    Returns:
+        dict: The response from the DynamoDB table.
+    """
     data = request.get_json()
 
     email = data["email"]
