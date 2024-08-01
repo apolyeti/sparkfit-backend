@@ -13,7 +13,7 @@ Functions:
 """
 
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 
 from flaskr.aws.config import get_aws_session
 from flaskr.utils.classes import SparkFitImage, SparkFitUser
@@ -189,19 +189,22 @@ def clear_user_closet(email: str) -> dict:
     )
     return response
 
-def add_outfit(email, outfits) -> dict:
+def add_outfit(email: str, outfits: List[Dict]) -> dict:
     """
     Adds outfits to the user's outfit list in the DynamoDB table.
 
     Parameters:
         email (str): The email of the user.
-        outfits (List[str]): The list of outfit IDs to add to the user's outfit list.
+        outfits (List[Dict]): The list of outfit dictionaries to add to the user's outfit list.
 
     Returns:
         dict: The response from the DynamoDB table.
     """
-    # store month, day, year of outfit
-    outfits["date"] = datetime.today().strftime("%m-%d-%Y")
+    # Add the current date to each outfit
+    current_date = datetime.today().strftime("%m-%d-%Y")
+    for outfit in outfits:
+        outfit["date"] = current_date
+
     table = dynamodb.Table("users")
     response = table.update_item(
         Key={"email": email},
