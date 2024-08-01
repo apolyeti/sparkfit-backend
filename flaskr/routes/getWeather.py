@@ -8,7 +8,17 @@ CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @bp.route("/getWeather", methods=["POST", "GET"])
 def getWeather():
-    """Get geolocation from request and return weather data"""
+    """
+    Get the weather at a given latitude and longitude.
+
+    Parameters:
+        lat (float): The latitude of the location.
+        lon (float): The longitude of the location.
+        API_KEY (str): The API key for the weather API.
+
+    Returns:
+        dict: The weather data at the given location.
+    """
     if request.method == "POST":
         data = request.get_json()
         lat = data["lat"]

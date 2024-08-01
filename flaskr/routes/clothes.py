@@ -19,23 +19,34 @@ from flaskr.utils.sparkfit_llm import SparkfitLLM
 
 llm = SparkfitLLM()
 
+# Load the model in a background thread so that the route can be used immediately
+
+# START THREAD
 def load_model():
     llm.load_model()
     print("\033[1;92m" + "Sparkfit-LLM loaded successfully!" + "\033[0m")
 
 threading.Thread(target=load_model).start()
+# END THREAD
 
 bp = Blueprint("clothes", __name__, url_prefix="/clothes")
 CORS(bp, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 model = download_classification_model()
-
 print("\033[1;92m" + "Model loaded successfully!" + "\033[0m")
 
 
 @bp.route("/classify", methods=["POST"])
 def classify():
-    """Will receive a list of files"""
+    """
+    Classify an uploaded image.
+
+    Parameters:
+        files (list): A list of image files to classify.
+
+    Returns:
+        dict: The classification results.
+    """
     if "files" not in request.files:
         return jsonify({"error": "No files found in request"}), 400
 
@@ -84,7 +95,16 @@ def classify():
 
 @bp.route("/add", methods=["POST"])
 def add_clothes():
-    """Add a user's clothes to the database"""
+    """
+    Add clothes to the database.
+
+    Parameters:
+        email (str): The user's email.
+        clothes (list): A list of SparkFitImage objects representing the clothes.
+
+    Returns:
+        dict: A message indicating the success of the operation.
+    """
     data = request.get_json()
     email = data["email"]
     clothes = data["clothes"]
@@ -105,7 +125,15 @@ def add_clothes():
 
 @bp.route("/get", methods=["POST"])
 def get_clothes():
-    """Get a user's clothes from the database"""
+    """
+    Get clothes from the database.
+
+    Parameters:
+        email (str): The user's email.
+
+    Returns:
+        dict: A list of the user's clothes.
+    """
 
     # get clothes from database, then get the images from S3
     data = request.get_json()
@@ -136,7 +164,16 @@ def get_clothes():
 
 @bp.route("/delete", methods=["POST"])
 def delete_clothes():
-    """Delete a user's clothes from the database"""
+    """
+    Delete clothes from the database.
+
+    Parameters:
+        email (str): The user's email.
+        photo_id (str): The photo ID of the clothes to delete.
+
+    Returns:
+        dict: A message indicating the success of the operation.
+    """
 
     data = request.get_json()
     email = data["email"]
@@ -150,7 +187,16 @@ def delete_clothes():
 
 @bp.route("/update", methods=["POST"])
 def update_clothes():
-    """Update a user's clothes in the database"""
+    """
+    Update clothes in the database.
+
+    Parameters:
+        email (str): The user's email.
+        updatedItem (dict): The updated clothing item.
+
+    Returns:
+        dict: A message indicating the success of the operation.
+    """
 
     data = request.get_json()
     email = data["email"]
@@ -165,14 +211,18 @@ def update_clothes():
 
 @bp.route("/outfit", methods=["POST"])
 def outfit():
-    """Will receive a list of
-    SparkfitImage objects
     """
+    Generate an outfit based on the user's clothes and the weather.
 
-    print("Outfit request received")
+    Parameters:
+        email (str): The user's email.
+        clothes (list): A list of DynamoImage objects representing the clothes.
+        temperature (int): The temperature.
+        condition (str): The weather condition.
 
-    # send the photo_id, category, fabric, color, fit to the model
-
+    Returns:
+        dict: The generated outfit.
+    """
     data = request.get_json()
     email = data["email"]
     clothes = data["clothes"]
@@ -181,10 +231,6 @@ def outfit():
 
     # translate to DynamoImage objects
     clothes = [DynamoImage(**cloth) for cloth in clothes]
-
-
-
-    # prompt = "\nYour Prompt:\n"
 
     prompt = ""
 
@@ -195,18 +241,16 @@ def outfit():
 
     prompt += "\nYour Response:\n"
 
-    # check if the model is loaded
+    # Stall until the model is loaded
     while not llm.is_loaded:
         pass
 
-
-
     generate = llm.generate_better_text(prompt)
     
-    # the string is in json format, so we need to convert it to a dictionary and return that as the response
+    # Response is a JSON formatted string
     response = json.loads(generate)
 
-    print("Sparkfit produced", len(response["choices"]), "outfit choices")
+    print("Sparkfit produced", len(response["choices"]), "outfit choices for", email)
 
     for choice in response["choices"]:
         for item in choice["outfit"]:
