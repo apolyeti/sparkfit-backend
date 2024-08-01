@@ -81,4 +81,3 @@ class SparkfitLLM:
         print(f"Response: {response}")
 
         return response
-    
