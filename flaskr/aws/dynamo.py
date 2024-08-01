@@ -12,7 +12,7 @@ Functions:
     update_clothes: Updates a clothing item in the user's closet in the DynamoDB table.
 """
 
-import datetime
+from datetime import datetime
 from typing import List
 
 from flaskr.aws.config import get_aws_session
@@ -201,7 +201,7 @@ def add_outfit(email, outfits) -> dict:
         dict: The response from the DynamoDB table.
     """
     # store month, day, year of outfit
-    outfits["date"] = datetime.now().strftime("%m/%d/%Y")
+    outfits["date"] = datetime.today().strftime("%m-%d-%Y")
     table = dynamodb.Table("users")
     response = table.update_item(
         Key={"email": email},
