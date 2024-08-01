@@ -55,7 +55,7 @@ def add_user(user: SparkFitUser) -> dict:
     return response
 
 
-def get_user(email: str):
+def get_user(email: str) -> dict:
     """
     Retrieves a user from the DynamoDB table.
 

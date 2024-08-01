@@ -9,7 +9,7 @@ Functions:
 """
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-from tensorflow.keras.models import load_model  # type: ignore
+from tensorflow.keras.models import load_model, Model
 
 from flaskr.aws.config import get_aws_session
 
@@ -18,7 +18,7 @@ session = get_aws_session()
 s3 = session.client("s3")
 
 
-def download_classification_model():
+def download_classification_model() -> Model:
     """
     Downloads the classification model from S3.
 
@@ -44,7 +44,7 @@ def download_classification_model():
     return load_model(local_file_path)
 
 
-def fetch_user_images(email):
+def fetch_user_images(email) -> list:
     """
     Fetches all images for a user from S3.
 
@@ -74,7 +74,7 @@ def fetch_user_images(email):
 
 
 
-def upload_image(email, file_name, file_data):
+def upload_image(email, file_name, file_data) -> dict:
     """
     Uploads an image to S3.
 
@@ -95,7 +95,7 @@ def upload_image(email, file_name, file_data):
     return response
 
 
-def clear_user_directory(email):
+def clear_user_directory(email) -> dict:
     """
     Clears all images for a user from S3.
 
