@@ -260,5 +260,27 @@ def outfit():
 
     return jsonify(response), 200
     
+@bp.route('outfit/fetch', methods=['POST'])
+def fetch_outfits():
+    """
+    Fetch the outfits for a user.
 
+    Parameters:
+        email (str): The user's email.
+
+    Returns:
+        dict: The user's outfits.
+    """
+    data = request.get_json()
+    email = data["email"]
+
+    outfits = db.get_outfits(email)
+
+    for outfit in outfits:
+        for item in outfit["outfit"]:
+            item["data_url"] = "https://d1kqmt6gl9p8lg.cloudfront.net/images/" + email.split("@")[0] + "/" + item["photo_id"] + ".jpg"
+
+    response = {"outfits": outfits}
+
+    return jsonify(response), 200
 

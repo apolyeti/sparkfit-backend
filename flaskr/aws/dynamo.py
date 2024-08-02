@@ -275,3 +275,18 @@ def update_clothes(email, cloth) -> None:
         ExpressionAttributeValues={":c": cloth},
         ReturnValues="UPDATED_NEW",
     )
+
+
+def get_outfits(email: str) -> List[dict]:
+    """
+    Retrieves the outfits from the user's outfit list in the DynamoDB table.
+
+    Parameters:
+        email (str): The email of the user.
+
+    Returns:
+        List[dict]: The list of outfits in the user's outfit list.
+    """
+    table = dynamodb.Table("users")
+    response = table.get_item(Key={"email": email})
+    return response["Item"]["outfits"]
