@@ -20,13 +20,19 @@ https://github.com/user-attachments/assets/4684b00a-f9d5-4059-b163-9dbef57832cb
 <img height="50" src="https://user-images.githubusercontent.com/25181517/117207330-263ba280-adf4-11eb-9b97-0ac5b40bc3be.png">
 
 
-## 🚧 Still in Development
+## 🚧 Not deployed yet
 
 There will be an `instance/` directory in the root of the project. This directory will contain any sensitive configuration files that should not be committed into the remote repository.
 
 You will also need to configure your own AWS credentials (for DynamoDB and S3) in order to run the backend locally. You can do this by following this [guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 
 Unfortunately, the ML models are stored in a private S3 bucket, so you will not be able to access them. If you would like to test the backend locally, please reach out to me and I can provide you with the necessary files.
+
+The Sparkfit LLM is stored on the HuggingFace repository, so you will need to configure your credentials for it as well. To access the Sparkfit LLM, you will need to request access, and you will need to use your HuggingFace token when loading the model using the Transformers library.
+
+Note: To use this LLM, your machine must have a NVIDIA GPU with CUDA <=v12.4 support for quantization. This essentially shrinks down the float pointer accuracy to a smaller value. (ex: 16 decimal points to 6 decimal points)
+
+If you do not have accees to a CUDA GPU, you may have to use a cloud service such as AWS Sagemaker or Brev.dev and use their GPUs.
 
 Many libraries used in this project do not fully support Apple Silicon, if at all. Both AI libraries, PyTorch and Tensorflow, run into large troubles with M1, M2, etc.. chips, so running this project on a machine with x86 architecture is advised.
 
