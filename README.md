@@ -30,7 +30,9 @@ Unfortunately, the ML models are stored in a private S3 bucket, so you will not 
 
 The Sparkfit LLM is stored on the HuggingFace repository, so you will need to configure your credentials for it as well. To access the Sparkfit LLM, you will need to request access, and you will need to use your HuggingFace token when loading the model using the Transformers library.
 
-Note: To use this LLM, your machine must have a NVIDIA GPU with CUDA <=v12.4 support for quantization. This essentially shrinks down the float pointer accuracy to a smaller value. (ex: 16 decimal points to 6 decimal points)
+Note: To use this LLM, your machine must have a NVIDIA GPU with CUDA <=v12.4 support for quantization. This essentially maps high precision values to lower precision values (ex: high precision datatypes to say 8bit ints) in order to mitigate memory and computation costs of such a large and costly model.
+
+You may read more about quantization [here](https://huggingface.co/docs/transformers/en/main_classes/quantization)
 
 If you do not have accees to a CUDA GPU, you may have to use a cloud service such as AWS Sagemaker or Brev.dev and use their GPUs.
 
