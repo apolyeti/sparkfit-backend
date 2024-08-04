@@ -24,9 +24,13 @@ https://github.com/user-attachments/assets/4684b00a-f9d5-4059-b163-9dbef57832cb
 
 There will be an `instance/` directory in the root of the project. This directory will contain any sensitive configuration files that should not be committed into the remote repository.
 
+Unfortunately, the ML models are stored in a private S3 bucket, so you will not be able to access them. If you would like to test the backend locally, please reach out to me and I can provide you with the necessary files.
+
 You will also need to configure your own AWS credentials (for DynamoDB and S3) in order to run the backend locally. You can do this by following this [guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 
-Unfortunately, the ML models are stored in a private S3 bucket, so you will not be able to access them. If you would like to test the backend locally, please reach out to me and I can provide you with the necessary files.
+Many libraries used in this project do not fully support Apple Silicon, if at all. Both AI libraries, PyTorch and Tensorflow, run into large troubles with M1, M2, etc.. chips, so running this project on a machine with x86 architecture is advised.
+
+Additionally, you will not be able to use certain libraries without an Nvidia GPU, with its CUDA toolkit. The highest version of CUDA that PyTorch supports as of July 27th, 2024, is v12.4. Refer to the [PyTorch docs](https://pytorch.org/get-started/locally/) for more information and/or updates.
 
 The Sparkfit LLM is stored on the HuggingFace repository, so you will need to configure your credentials for it as well. To access the Sparkfit LLM, you will need to request access, and you will need to use your HuggingFace token when loading the model using the Transformers library.
 
@@ -35,10 +39,6 @@ Note: To use this LLM, your machine must have a NVIDIA GPU with CUDA <=v12.4 sup
 You may read more about quantization [here](https://huggingface.co/docs/transformers/en/main_classes/quantization)
 
 If you do not have accees to a CUDA GPU, you may have to use a cloud service such as AWS Sagemaker or Brev.dev and use their GPUs.
-
-Many libraries used in this project do not fully support Apple Silicon, if at all. Both AI libraries, PyTorch and Tensorflow, run into large troubles with M1, M2, etc.. chips, so running this project on a machine with x86 architecture is advised.
-
-Additionally, you wil not be able to use certain libraries without an Nvidia GPU, with its CUDA toolkit. The highest version of CUDA that PyTorch supports as of July 27th, 2024, is v12.4. Refer to the [PyTorch docs](https://pytorch.org/get-started/locally/) for more information and/or updates.
 
 ## Getting Started
 
