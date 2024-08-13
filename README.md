@@ -38,7 +38,7 @@ Note: To use this LLM, your machine must have a NVIDIA GPU with CUDA <=v12.4 sup
 
 You may read more about quantization [here](https://huggingface.co/docs/transformers/en/main_classes/quantization)
 
-If you do not have accees to a CUDA GPU, you may have to use a cloud service such as AWS Sagemaker or Brev.dev and use their GPUs.
+If you do not have accees to a CUDA GPU, you may have to use a cloud service such as AWS Sagemaker and use their GPUs.
 
 ## Getting Started
 
