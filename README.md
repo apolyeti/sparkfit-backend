@@ -10,6 +10,7 @@ https://github.com/user-attachments/assets/4684b00a-f9d5-4059-b163-9dbef57832cb
 <img height="50" src="https://user-images.githubusercontent.com/25181517/183423775-2276e25d-d43d-4e58-890b-edbc88e915f7.png">
 <img height="50" src="https://user-images.githubusercontent.com/25181517/183568594-85e280a7-0d7e-4d1a-9028-c8c2209e073c.png">
 <img height="50" src="https://user-images.githubusercontent.com/25181517/223639822-2a01e63a-a7f9-4a39-8930-61431541bc06.png">
+<img height="50" src="https://www.svgrepo.com/show/306619/pytorch.svg">
 <img height="50" src="https://user-images.githubusercontent.com/25181517/183896132-54262f2e-6d98-41e3-8888-e40ab5a17326.png">
 <img height="50" src="https://user-images.githubusercontent.com/25181517/202896760-337261ed-ee92-4979-84c4-d4b829c7355d.png"> 
 <img src="https://skillicons.dev/icons?i=dynamodb" height="50">
