@@ -56,7 +56,7 @@ If you do not have accees to a CUDA GPU, you may have to use a cloud service suc
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/sparkfit-backend.git
+   git clone https://github.com/apolyeti/sparkfit-backend.git
    cd sparkfit-backend
    ```
 
